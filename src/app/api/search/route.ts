@@ -3,7 +3,10 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import db from '@/lib/db'
 import { getSignedUrl } from '@/lib/minio'
-import { DocumentType, Module, Prisma } from '@prisma/client'
+import type { DocumentType, Module, Prisma } from '@prisma/client'
+import { DOCUMENT_TYPE_LABELS, MODULE_LABELS } from '@/lib/constants'
+
+const VALID_MODULES = Object.keys(MODULE_LABELS)
 
 function getEntityName(doc: {
   client?: { nom: string } | null
@@ -38,11 +41,11 @@ export async function GET(req: Request) {
 
   const where: Prisma.DocumentWhereInput = {}
 
-  if (type) {
+  if (type && Object.keys(DOCUMENT_TYPE_LABELS).includes(type)) {
     where.documentType = type as DocumentType
   }
 
-  if (moduleParam) {
+  if (moduleParam && VALID_MODULES.includes(moduleParam)) {
     where.module = moduleParam as Module
   }
 

@@ -23,7 +23,10 @@ export function SearchBar({
 
   // Sync internal state if URL searchParams change externally (e.g. filter reset)
   useEffect(() => {
-    setValue(paramEntity)
+    if (value.trim() !== paramEntity) {
+      setValue(paramEntity)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paramEntity])
 
   // Debounced update to router

@@ -140,6 +140,17 @@ describe('GET /api/search', () => {
     expect(data[0].module).toBe('CLIENTS')
   })
 
+  it('ignores invalid type and module parameters to prevent Prisma errors', async () => {
+    ;(db.document.findMany as jest.Mock).mockImplementationOnce(async ({ where }) => {
+      expect(where.documentType).toBeUndefined()
+      expect(where.module).toBeUndefined()
+      return []
+    })
+
+    const res = await GET(authenticatedRequest('/api/search?type=INVALID_TYPE&module=INVALID_MODULE'))
+    expect(res.status).toBe(200)
+  })
+
   it('filters by entity text across client, fournisseur, machine, travailleur, and title', async () => {
     ;(db.document.findMany as jest.Mock).mockImplementationOnce(async ({ where }) => {
       expect(where.OR).toEqual(

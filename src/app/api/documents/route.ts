@@ -186,6 +186,8 @@ export async function POST(req: Request) {
       ? true
       : data.isPaid === 'false'
       ? false
+      : data.documentType === 'FACTURE_VENTE' || data.documentType === 'FACTURE_ACHAT'
+      ? false
       : null
 
   const document = await db.document.create({

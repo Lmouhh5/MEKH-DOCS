@@ -80,4 +80,39 @@ describe('DocumentDetailPanel', () => {
       ).toBeInTheDocument()
     })
   })
+
+  it('renders PaidToggle for FACTURE_ACHAT documents from FOURNISSEURS', async () => {
+    const mockSupplierInvoice = {
+      id: 'doc-456',
+      title: 'Facture Fournisseur Ciment',
+      documentType: 'FACTURE_ACHAT',
+      module: 'FOURNISSEURS',
+      issueDate: '2026-03-10T00:00:00.000Z',
+      amount: 120000,
+      isPaid: false,
+      fournisseur: { id: 'fournisseur-1', nom: 'Lafarge Algérie' },
+    }
+
+    ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: async () => mockSupplierInvoice,
+    })
+
+    render(
+      <DocumentDetailPanel
+        documentId="doc-456"
+        isOpen={true}
+        onClose={jest.fn()}
+      />
+    )
+
+    await waitFor(() => {
+      expect(screen.getByText('Facture Fournisseur Ciment')).toBeInTheDocument()
+      expect(screen.getByText("Facture d'achat")).toBeInTheDocument()
+      expect(screen.getByText('Lafarge Algérie')).toBeInTheDocument()
+      expect(screen.getByText('Impayé')).toBeInTheDocument()
+    })
+  })
 })
+

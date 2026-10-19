@@ -13,9 +13,29 @@ import { PlusIcon, Loader2Icon } from 'lucide-react'
 export interface EntityDocumentListProps {
   module: ModuleKey
   entityId: string
+  title?: string
   initialDocuments?: DocumentSummary[]
   uploadHref?: string
   className?: string
+}
+
+function getDefaultEntityTitle(module: ModuleKey): string {
+  switch (module) {
+    case 'CLIENTS':
+      return 'Documents du Client'
+    case 'FOURNISSEURS':
+      return 'Documents du Fournisseur'
+    case 'MATERIEL':
+      return 'Documents du Matériel'
+    case 'PERSONNEL':
+      return 'Documents du Personnel'
+    case 'TRESORERIE':
+      return 'Documents de Trésorerie'
+    case 'FISCALITE':
+      return 'Documents Fiscaux'
+    default:
+      return 'Documents'
+  }
 }
 
 function getEntityQueryParam(module: ModuleKey): string {
@@ -36,6 +56,7 @@ function getEntityQueryParam(module: ModuleKey): string {
 export function EntityDocumentList({
   module,
   entityId,
+  title,
   initialDocuments,
   uploadHref,
   className,
@@ -73,7 +94,9 @@ export function EntityDocumentList({
     <div className={className}>
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-lg font-semibold tracking-tight">Documents du Client</h3>
+          <h3 className="text-lg font-semibold tracking-tight">
+            {title || getDefaultEntityTitle(module)}
+          </h3>
           <p className="text-sm text-muted-foreground">
             {documents.length} document{documents.length > 1 ? 's' : ''} associé{documents.length > 1 ? 's' : ''}
           </p>

@@ -96,4 +96,30 @@ describe('EntityDocumentList', () => {
       expect(screen.getByText('Facture Janvier')).toBeInTheDocument()
     })
   })
+
+  it('renders default title for FOURNISSEURS', () => {
+    render(
+      <EntityDocumentList
+        module="FOURNISSEURS"
+        entityId="fournisseur-1"
+        initialDocuments={[]}
+      />
+    )
+
+    expect(screen.getByText('Documents du Fournisseur')).toBeInTheDocument()
+  })
+
+  it('renders custom title when provided', () => {
+    render(
+      <EntityDocumentList
+        module="FOURNISSEURS"
+        entityId="fournisseur-1"
+        title="Factures et Bons Fournisseur"
+        initialDocuments={[]}
+      />
+    )
+
+    expect(screen.getByText('Factures et Bons Fournisseur')).toBeInTheDocument()
+  })
 })
+

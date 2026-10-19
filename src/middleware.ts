@@ -18,5 +18,6 @@ export const config = {
     '/tresorerie/:path*',
     '/fiscalite/:path*',
     '/recherche/:path*',
+    '/documents/:path*',
   ],
 }

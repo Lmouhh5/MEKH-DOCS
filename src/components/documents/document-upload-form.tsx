@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import {
   DOCUMENT_TYPES_BY_MODULE,
   DOCUMENT_TYPE_LABELS,
@@ -25,6 +25,7 @@ export function DocumentUploadForm({
   onSuccess,
 }: DocumentUploadFormProps) {
   const [file, setFile] = useState<File | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [title, setTitle] = useState('')
   const [documentType, setDocumentType] = useState<string>('')
   const [issueDate, setIssueDate] = useState('')
@@ -109,6 +110,17 @@ export function DocumentUploadForm({
       }
 
       toast.success('Document téléversé avec succès')
+      setFile(null)
+      setTitle('')
+      setDocumentType('')
+      setIssueDate('')
+      setDueDate('')
+      setAmount('')
+      setPhysicalLocation('')
+      setNotes('')
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
       onSuccess()
     } catch {
       toast.error('Erreur de connexion au serveur')
@@ -123,6 +135,7 @@ export function DocumentUploadForm({
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="file">Fichier (PDF uniquement) *</Label>
         <Input
+          ref={fileInputRef}
           id="file"
           name="file"
           type="file"

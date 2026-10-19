@@ -111,12 +111,7 @@ export function DocumentDetailPanel({
     }
   }, [documentId, open, fetchDocument])
 
-  const isInvoice =
-    doc &&
-    (doc.documentType === 'FACTURE_VENTE' ||
-      doc.documentType === 'FACTURE_ACHAT' ||
-      doc.documentType === 'FACTURE_REPARATION' ||
-      doc.isPaid !== null)
+  const isInvoice = doc?.isPaid != null
 
   const entityName =
     doc?.client?.nom ||

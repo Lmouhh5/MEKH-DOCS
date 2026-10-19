@@ -77,4 +77,33 @@ describe('PdfViewer', () => {
       expect(window.location.assign).toHaveBeenCalledWith('/login')
     })
   })
+
+  it('syncs expiresAtRef when expiresAt or initialUrl prop changes', async () => {
+    const fetchMock = jest.fn()
+    global.fetch = fetchMock
+
+    const { rerender } = render(
+      <PdfViewer
+        documentId="d1"
+        initialUrl="http://minio/old.pdf"
+        expiresAt={Date.now() + 600_000}
+      />
+    )
+
+    // Initially far from expiry -> no refresh
+    fireEvent(window, new Event('focus'))
+    expect(fetchMock).not.toHaveBeenCalled()
+
+    // Update expiresAt to be near expiry (< 2 min)
+    rerender(
+      <PdfViewer
+        documentId="d1"
+        initialUrl="http://minio/new.pdf"
+        expiresAt={Date.now() + 60_000}
+      />
+    )
+
+    fireEvent(window, new Event('focus'))
+    expect(fetchMock).toHaveBeenCalledWith('/api/documents/d1/signed-url')
+  })
 })

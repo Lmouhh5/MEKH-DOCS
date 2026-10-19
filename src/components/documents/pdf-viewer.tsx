@@ -17,12 +17,10 @@ export function PdfViewer({
   // Default signed URL expiry is 15 minutes (900 seconds) if not provided
   const expiresAtRef = useRef<number>(expiresAt ?? Date.now() + 15 * 60 * 1000)
 
-  // Keep ref in sync if expiresAt prop changes
+  // Keep ref in sync if expiresAt prop changes or initialUrl changes
   useEffect(() => {
-    if (expiresAt !== undefined) {
-      expiresAtRef.current = expiresAt
-    }
-  }, [expiresAt])
+    expiresAtRef.current = expiresAt ?? Date.now() + 15 * 60 * 1000
+  }, [expiresAt, initialUrl])
 
   useEffect(() => {
     setCurrentUrl(initialUrl)

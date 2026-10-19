@@ -51,7 +51,7 @@ export async function GET(
         module: doc.module,
         issueDate: doc.issueDate.toISOString(),
         dueDate: doc.dueDate ? doc.dueDate.toISOString() : undefined,
-        amount: doc.amount ? Number(doc.amount) : undefined,
+        amount: doc.amount != null ? Number(doc.amount) : undefined,
         isPaid: doc.isPaid ?? undefined,
         physicalLocation: doc.physicalLocation,
         notes: doc.notes,

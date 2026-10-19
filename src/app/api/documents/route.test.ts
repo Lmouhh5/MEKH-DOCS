@@ -3,7 +3,7 @@
  */
 import { POST, GET } from './route'
 import db from '@/lib/db'
-import { uploadFile, getSignedUrl } from '@/lib/minio'
+import { uploadFile, getSignedUrl, deleteFile } from '@/lib/minio'
 
 let mockSession: { user: { id: string; email: string; role: string } } | null = null
 
@@ -270,6 +270,74 @@ describe('POST /api/documents', () => {
         travailleurId: null,
       }),
     })
+  })
+
+  it('returns 400 when file size exceeds 25MB', async () => {
+    mockSession = { user: { id: 'u1', email: 'admin@erp.local', role: 'ADMIN' } }
+    const mockFile = new File(['content'], 'large.pdf', { type: 'application/pdf' })
+    Object.defineProperty(mockFile, 'size', { value: 26 * 1024 * 1024 })
+
+    const formData = new FormData()
+    formData.append('title', 'Gros document')
+    formData.append('module', 'CLIENTS')
+    formData.append('documentType', 'FACTURE_VENTE')
+    formData.append('issueDate', '2026-03-01')
+
+    const req = new Request('http://localhost/api/documents', { method: 'POST' })
+    jest.spyOn(req, 'formData').mockResolvedValue(formData)
+    const originalGet = formData.get.bind(formData)
+    jest.spyOn(formData, 'get').mockImplementation((key: string) => {
+      if (key === 'file') return mockFile
+      return originalGet(key)
+    })
+
+    const res = await POST(req)
+    expect(res.status).toBe(400)
+    const json = await res.json()
+    expect(json.error).toBe('Le fichier dépasse la taille maximale autorisée (25 Mo)')
+  })
+
+  it('returns 400 when file is not a PDF', async () => {
+    mockSession = { user: { id: 'u1', email: 'admin@erp.local', role: 'ADMIN' } }
+    const textBlob = new Blob(['hello world'], { type: 'text/plain' })
+    const req = createMultipartRequest(
+      {
+        title: 'Fichier texte',
+        module: 'CLIENTS',
+        documentType: 'FACTURE_VENTE',
+        issueDate: '2026-03-01',
+      },
+      textBlob,
+      'document.txt'
+    )
+
+    const res = await POST(req)
+    expect(res.status).toBe(400)
+    const json = await res.json()
+    expect(json.error).toBe('Seuls les fichiers PDF sont acceptés')
+  })
+
+  it('cleans up uploaded MinIO file with deleteFile if db.document.create throws', async () => {
+    mockSession = { user: { id: 'u1', email: 'admin@erp.local', role: 'ADMIN' } }
+    const errorSpy = jest.spyOn(db.document, 'create').mockRejectedValueOnce(new Error('DB failure'))
+
+    const req = createMultipartRequest(
+      {
+        title: 'Facture Client Fail',
+        module: 'CLIENTS',
+        documentType: 'FACTURE_VENTE',
+        issueDate: '2026-03-01',
+      },
+      new Blob(['pdf content'], { type: 'application/pdf' }),
+      'fail.pdf'
+    )
+
+    const res = await POST(req)
+    expect(res.status).toBe(500)
+    const json = await res.json()
+    expect(json.error).toBe('Erreur lors de la création du document en base de données')
+    expect(deleteFile).toHaveBeenCalledWith(expect.stringContaining('CLIENTS/'))
+    errorSpy.mockRestore()
   })
 })
 

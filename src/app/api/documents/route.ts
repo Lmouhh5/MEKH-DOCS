@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import db from '@/lib/db'
-import { uploadFile, getSignedUrl, generateKey } from '@/lib/minio'
+import { uploadFile, getSignedUrl, generateKey, deleteFile } from '@/lib/minio'
 import { DOCUMENT_TYPES_BY_MODULE, DocumentTypeKey, ModuleKey } from '@/lib/constants'
 import { Prisma } from '@prisma/client'
 import { z } from 'zod'
@@ -106,6 +106,24 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Le fichier est requis' }, { status: 400 })
   }
 
+  const MAX_FILE_SIZE = 25 * 1024 * 1024
+  if (file.size > MAX_FILE_SIZE) {
+    return NextResponse.json(
+      { error: 'Le fichier dépasse la taille maximale autorisée (25 Mo)' },
+      { status: 400 }
+    )
+  }
+
+  const filename = file.name || 'document.pdf'
+  const isPdf =
+    file.type === 'application/pdf' || filename.toLowerCase().endsWith('.pdf')
+  if (!isPdf) {
+    return NextResponse.json(
+      { error: 'Seuls les fichiers PDF sont acceptés' },
+      { status: 400 }
+    )
+  }
+
   const rawData = {
     title: (formData.get('title') as string) || '',
     module: (formData.get('module') as string) || '',
@@ -140,8 +158,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Erreur lors de la lecture du fichier' }, { status: 500 })
   }
 
-  const filename = file.name || 'document.pdf'
-  const mimetype = file.type || 'application/octet-stream'
+  const mimetype = file.type || 'application/pdf'
 
   const finalClientId =
     data.module === 'CLIENTS' ? (data.clientId || data.entityId || null) : null
@@ -190,24 +207,33 @@ export async function POST(req: Request) {
       ? false
       : null
 
-  const document = await db.document.create({
-    data: {
-      title: data.title,
-      documentType: data.documentType as DocumentTypeKey,
-      module: data.module as ModuleKey,
-      issueDate: new Date(data.issueDate),
-      dueDate: parsedDueDate,
-      amount: parsedAmount,
-      isPaid: parsedIsPaid,
-      physicalLocation: data.physicalLocation || null,
-      notes: data.notes || null,
-      fileKey: key,
-      clientId: finalClientId,
-      fournisseurId: finalFournisseurId,
-      machineId: finalMachineId,
-      travailleurId: finalTravailleurId,
-    },
-  })
+  let document
+  try {
+    document = await db.document.create({
+      data: {
+        title: data.title,
+        documentType: data.documentType as DocumentTypeKey,
+        module: data.module as ModuleKey,
+        issueDate: new Date(data.issueDate),
+        dueDate: parsedDueDate,
+        amount: parsedAmount,
+        isPaid: parsedIsPaid,
+        physicalLocation: data.physicalLocation || null,
+        notes: data.notes || null,
+        fileKey: key,
+        clientId: finalClientId,
+        fournisseurId: finalFournisseurId,
+        machineId: finalMachineId,
+        travailleurId: finalTravailleurId,
+      },
+    })
+  } catch {
+    await deleteFile(key).catch(() => {})
+    return NextResponse.json(
+      { error: 'Erreur lors de la création du document en base de données' },
+      { status: 500 }
+    )
+  }
 
   const signedUrl = await getSignedUrl(document.fileKey)
   const documentWithoutKey = { ...document }

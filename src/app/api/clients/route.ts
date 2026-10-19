@@ -11,7 +11,10 @@ const clientCreateSchema = z.object({
   adresse: z.string().trim().nullable().optional(),
 })
 
-export async function GET() {
+export async function GET(): Promise<NextResponse>
+export async function GET(req: Request): Promise<NextResponse>
+export async function GET(_req?: Request): Promise<NextResponse> {
+  void _req
   const session = await getServerSession(authOptions)
   if (!session) {
     return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })

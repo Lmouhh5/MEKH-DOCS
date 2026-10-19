@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs'
 import { Role } from '@prisma/client'
-import type { User } from 'next-auth'
+import type { AdapterUser } from 'next-auth/adapters'
 import { authorize, authOptions } from './auth'
 
 jest.mock('@/lib/db', () => {
@@ -83,14 +83,18 @@ describe('authOptions callbacks', () => {
   it('session callback attaches id and role to session.user', async () => {
     const session = await authOptions.callbacks!.session!({
       session: {
-        user: { name: 'Admin', email: 'admin@erp.local' },
+        user: { id: 'user-1', role: Role.ADMIN, name: 'Admin', email: 'admin@erp.local' },
         expires: '2026-12-31',
       },
       token: {
         id: 'user-1',
         role: Role.ADMIN,
       },
-      user: {} as unknown as User,
+      user: {
+        id: 'user-1',
+        email: 'admin@erp.local',
+        emailVerified: null,
+      } as unknown as AdapterUser,
       newSession: null,
       trigger: 'update',
     })

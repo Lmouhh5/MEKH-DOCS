@@ -135,12 +135,15 @@ export function computeDocumentSeverity(
   warnDays: number,
   redDays: number
 ): 'yellow' | 'red' | 'overdue' | null {
-  if (dueDate.getTime() < now.getTime()) {
+  const startOfNow = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const startOfDue = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate())
+
+  if (startOfDue.getTime() < startOfNow.getTime()) {
     return 'overdue'
   }
 
-  const diffMs = dueDate.getTime() - now.getTime()
-  const daysUntil = Math.ceil(diffMs / (1000 * 60 * 60 * 24))
+  const diffMs = startOfDue.getTime() - startOfNow.getTime()
+  const daysUntil = Math.round(diffMs / (1000 * 60 * 60 * 24))
 
   if (daysUntil <= redDays) {
     return 'red'

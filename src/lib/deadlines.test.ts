@@ -125,6 +125,12 @@ describe('deadlines logic', () => {
       expect(computeDocumentSeverity(dueDate, now, warnDays, redDays)).toBe('overdue')
     })
 
+    it('does not mark a document due today as overdue at noon (returns red alert)', () => {
+      const now = new Date('2026-10-15T12:00:00Z')
+      const dueDate = new Date('2026-10-15T00:00:00Z')
+      expect(computeDocumentSeverity(dueDate, now, warnDays, redDays)).toBe('red')
+    })
+
     it('returns "red" if daysUntil <= redDays', () => {
       const now = new Date('2026-10-10T00:00:00Z')
       const dueDate = new Date('2026-10-15T00:00:00Z') // 5 days until

@@ -22,6 +22,7 @@ import {
   FileTextIcon,
   AlertCircleIcon,
   Building2Icon,
+  ExternalLinkIcon,
 } from 'lucide-react'
 
 export interface DocumentDetail {
@@ -276,9 +277,22 @@ export function DocumentDetailPanel({
 
               {/* Visionneuse PDF */}
               <div className="flex flex-col gap-2">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Aperçu du document PDF
-                </h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Aperçu du document PDF
+                  </h3>
+                  {(doc.signedUrl || doc.url) && (
+                    <a
+                      href={doc.signedUrl || doc.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline font-medium"
+                    >
+                      <ExternalLinkIcon className="size-3.5" />
+                      Ouvrir dans un nouvel onglet / Télécharger
+                    </a>
+                  )}
+                </div>
                 <div className="h-[550px] w-full rounded-lg overflow-hidden border border-border/50 shadow-sm">
                   <PdfViewer
                     documentId={doc.id}

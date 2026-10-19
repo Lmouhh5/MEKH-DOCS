@@ -91,6 +91,7 @@ export async function GET(req: Request) {
     orderBy: {
       issueDate: 'desc',
     },
+    take: 100,
   })
 
   const results = await Promise.all(

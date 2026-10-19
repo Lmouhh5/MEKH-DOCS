@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/sheet'
 import { PdfViewer } from '@/components/documents/pdf-viewer'
 import { PaidToggle } from '@/components/documents/paid-toggle'
+import { DocumentLinkWidget } from '@/components/documents/document-link-widget'
 import { DOCUMENT_TYPE_LABELS, MODULE_LABELS, DocumentTypeKey, ModuleKey } from '@/lib/constants'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
@@ -19,7 +20,6 @@ import {
   BanknoteIcon,
   MapPinIcon,
   FileTextIcon,
-  Link2Icon,
   AlertCircleIcon,
   Building2Icon,
 } from 'lucide-react'
@@ -79,11 +79,16 @@ export function DocumentDetailPanel({
   onClose,
   onDocumentUpdated,
 }: DocumentDetailPanelProps) {
+  const [activeDocumentId, setActiveDocumentId] = useState<string | null>(documentId)
   const [doc, setDoc] = useState<DocumentDetail | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
 
   const open = isOpen !== undefined ? isOpen : Boolean(documentId)
+
+  useEffect(() => {
+    setActiveDocumentId(documentId)
+  }, [documentId])
 
   const fetchDocument = useCallback(async (id: string) => {
     setLoading(true)
@@ -103,13 +108,13 @@ export function DocumentDetailPanel({
   }, [])
 
   useEffect(() => {
-    if (documentId && open) {
-      void fetchDocument(documentId)
+    if (activeDocumentId && open) {
+      void fetchDocument(activeDocumentId)
     } else if (!open) {
       setDoc(null)
       setError(null)
     }
-  }, [documentId, open, fetchDocument])
+  }, [activeDocumentId, open, fetchDocument])
 
   const isInvoice =
     doc?.isPaid != null ||
@@ -259,22 +264,13 @@ export function DocumentDetailPanel({
                 </div>
               )}
 
-              {/* Widget de liaison (Placeholder pour Task 13) */}
-              <div
-                data-testid="document-link-widget-placeholder"
-                className="p-4 border border-dashed rounded-lg bg-muted/10 flex flex-col gap-1.5"
-              >
-                <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
-                  <Link2Icon className="size-3.5 text-primary" />
-                  <span>Liens entre documents</span>
-                  <Badge variant="outline" className="text-[10px] ml-auto py-0">
-                    Task 13
-                  </Badge>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Le widget de liaison documentaire permettra d&apos;associer ce document à des devis, réceptions ou règlements.
-                </p>
-              </div>
+              {/* Widget de liaison documentaire */}
+              <DocumentLinkWidget
+                documentId={doc.id}
+                onSelectLinkedDocument={(newDocId) => {
+                  setActiveDocumentId(newDocId)
+                }}
+              />
 
               <Separator />
 

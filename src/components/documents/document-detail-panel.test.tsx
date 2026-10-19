@@ -55,8 +55,8 @@ describe('DocumentDetailPanel', () => {
     // Check PaidToggle
     expect(screen.getByText('Impayé')).toBeInTheDocument()
 
-    // Check DocumentLinkWidget placeholder
-    expect(screen.getByTestId('document-link-widget-placeholder')).toBeInTheDocument()
+    // Check DocumentLinkWidget
+    expect(screen.getByTestId('document-link-widget')).toBeInTheDocument()
   })
 
   it('renders error message when document fails to fetch', async () => {

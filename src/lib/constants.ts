@@ -42,7 +42,7 @@ export const DocumentType = {
 export type DocumentTypeKey = keyof typeof DocumentType
 export const DOCUMENT_TYPE_LABELS = DocumentType
 
-export const DOCUMENT_TYPES_BY_MODULE: Record<string, string[]> = {
+export const DOCUMENT_TYPES_BY_MODULE: Record<ModuleKey, DocumentTypeKey[]> = {
   CLIENTS: ['FACTURE_VENTE', 'BON_DE_LIVRAISON', 'CONTRAT_CLIENT', 'DEVIS'],
   FOURNISSEURS: ['FACTURE_ACHAT', 'BON_DE_COMMANDE', 'BON_DE_RECEPTION'],
   MATERIEL: ['CARTE_GRISE', 'ASSURANCE', 'CONTROLE_TECHNIQUE', 'D10', 'FACTURE_REPARATION'],

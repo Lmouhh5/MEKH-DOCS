@@ -1,0 +1,165 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  VIEWER
+}
+
+enum MachineStatut {
+  ACTIF
+  EN_MAINTENANCE
+  HORS_SERVICE
+}
+
+enum Module {
+  CLIENTS
+  FOURNISSEURS
+  MATERIEL
+  PERSONNEL
+  TRESORERIE
+  FISCALITE
+}
+
+enum DocumentType {
+  FACTURE_VENTE
+  BON_DE_LIVRAISON
+  CONTRAT_CLIENT
+  DEVIS
+  FACTURE_ACHAT
+  BON_DE_COMMANDE
+  BON_DE_RECEPTION
+  CARTE_GRISE
+  ASSURANCE
+  CONTROLE_TECHNIQUE
+  D10
+  FACTURE_REPARATION
+  FICHE_DE_PAIE
+  CONTRAT_TRAVAIL
+  PIECE_IDENTITE
+  RELEVE_BANCAIRE
+  RECU_PAIEMENT
+  REGISTRE_COMMERCE
+  G50
+  G4
+  G12
+  G40
+  ETAT_104
+  CNAS_DECLARATION
+  CASNOS
+  CACOBATPH
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  role      Role     @default(ADMIN)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Client {
+  id        String     @id @default(cuid())
+  nom       String
+  nif       String?
+  telephone String?
+  adresse   String?
+  documents Document[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Fournisseur {
+  id        String     @id @default(cuid())
+  nom       String
+  nif       String?
+  telephone String?
+  adresse   String?
+  documents Document[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Machine {
+  id          String        @id @default(cuid())
+  machineId   String        @unique
+  marque      String?
+  modele      String?
+  numeroSerie String?
+  matricule   String?
+  statut      MachineStatut @default(ACTIF)
+  documents   Document[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model Travailleur {
+  id                   String     @id @default(cuid())
+  nom                  String
+  numeroIdentification String?
+  dateDebutContrat     DateTime?
+  numeroCnas           String?
+  documents            Document[]
+  createdAt            DateTime   @default(now())
+  updatedAt            DateTime   @updatedAt
+}
+
+model Document {
+  id               String         @id @default(cuid())
+  title            String
+  documentType     DocumentType
+  module           Module
+  issueDate        DateTime
+  dueDate          DateTime?
+  amount           Decimal?       @db.Decimal(15, 2)
+  isPaid           Boolean?
+  physicalLocation String?
+  notes            String?
+  fileKey          String
+  clientId         String?
+  client           Client?        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  fournisseurId    String?
+  fournisseur      Fournisseur?   @relation(fields: [fournisseurId], references: [id], onDelete: Cascade)
+  machineId        String?
+  machine          Machine?       @relation(fields: [machineId], references: [id], onDelete: Cascade)
+  travailleurId    String?
+  travailleur      Travailleur?   @relation(fields: [travailleurId], references: [id], onDelete: Cascade)
+  linkedTo         DocumentLink[] @relation("DocumentA")
+  linkedFrom       DocumentLink[] @relation("DocumentB")
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  @@index([module])
+  @@index([documentType])
+  @@index([issueDate])
+  @@index([dueDate])
+  @@index([isPaid])
+}
+
+model DocumentLink {
+  id          String   @id @default(cuid())
+  documentAId String
+  documentA   Document @relation("DocumentA", fields: [documentAId], references: [id], onDelete: Cascade)
+  documentBId String
+  documentB   Document @relation("DocumentB", fields: [documentBId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@unique([documentAId, documentBId])
+}
+
+model ManualDeadline {
+  id               String   @id @default(cuid())
+  label            String
+  dueDate          DateTime
+  yellowDaysBefore Int      @default(30)
+  redDaysBefore    Int      @default(7)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}

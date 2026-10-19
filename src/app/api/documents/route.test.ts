@@ -241,6 +241,36 @@ describe('POST /api/documents', () => {
     expect(json.signedUrl).toContain('http://minio/signed/')
     expect(json.url).toContain('http://minio/signed/')
   })
+
+  it('enforces strict entity isolation so IDs from other modules are ignored', async () => {
+    mockSession = { user: { id: 'u1', email: 'admin@erp.local', role: 'ADMIN' } }
+    const req = createMultipartRequest(
+      {
+        title: 'Assurance Machine',
+        module: 'MATERIEL',
+        documentType: 'ASSURANCE',
+        issueDate: '2026-01-01',
+        dueDate: '2027-01-01',
+        clientId: 'client-should-be-ignored',
+        entityId: 'machine-99',
+      },
+      new Blob(['pdf-bytes'], { type: 'application/pdf' }),
+      'assurance.pdf'
+    )
+
+    const res = await POST(req)
+    expect(res.status).toBe(201)
+
+    expect(db.document.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        module: 'MATERIEL',
+        machineId: 'machine-99',
+        clientId: null,
+        fournisseurId: null,
+        travailleurId: null,
+      }),
+    })
+  })
 })
 
 describe('GET /api/documents', () => {

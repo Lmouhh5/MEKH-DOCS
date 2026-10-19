@@ -144,17 +144,17 @@ export async function POST(req: Request) {
   const mimetype = file.type || 'application/octet-stream'
 
   const finalClientId =
-    data.module === 'CLIENTS' ? data.clientId || data.entityId || null : data.clientId || null
+    data.module === 'CLIENTS' ? (data.clientId || data.entityId || null) : null
   const finalFournisseurId =
     data.module === 'FOURNISSEURS'
-      ? data.fournisseurId || data.entityId || null
-      : data.fournisseurId || null
+      ? (data.fournisseurId || data.entityId || null)
+      : null
   const finalMachineId =
-    data.module === 'MATERIEL' ? data.machineId || data.entityId || null : data.machineId || null
+    data.module === 'MATERIEL' ? (data.machineId || data.entityId || null) : null
   const finalTravailleurId =
     data.module === 'PERSONNEL'
-      ? data.travailleurId || data.entityId || null
-      : data.travailleurId || null
+      ? (data.travailleurId || data.entityId || null)
+      : null
 
   const keyEntityId =
     finalClientId ||

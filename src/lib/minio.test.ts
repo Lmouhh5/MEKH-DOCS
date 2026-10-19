@@ -19,6 +19,9 @@ describe('minio file storage helper', () => {
 
     const keyUndefined = generateKey('TRESORERIE', undefined, 'releve.pdf')
     expect(keyUndefined).toMatch(/^TRESORERIE\/global\/\d+-releve\.pdf$/)
+
+    const keySanitized = generateKey('MATERIEL', 'eng-1', 'carte grise #1 (final)!.pdf')
+    expect(keySanitized).toMatch(/^MATERIEL\/eng-1\/\d+-carte_grise__1__final__\.pdf$/)
   })
 
   it('uploadFile calls minioClient.putObject with expected arguments', async () => {

@@ -46,5 +46,6 @@ export async function deleteFile(key: string): Promise<void> {
 }
 
 export function generateKey(module: string, entityId: string | null | undefined, filename: string): string {
-  return `${module}/${entityId ?? 'global'}/${Date.now()}-${filename}`
+  const sanitizedFilename = filename.replace(/[^a-zA-Z0-9.-]/g, '_')
+  return `${module}/${entityId ?? 'global'}/${Date.now()}-${sanitizedFilename}`
 }

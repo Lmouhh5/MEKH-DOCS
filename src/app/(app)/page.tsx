@@ -41,6 +41,7 @@ function formatDZD(amount: number) {
 export default function DashboardPage() {
   const [calendarAlerts, setCalendarAlerts] = useState<CalendarAlert[]>([])
   const [documentAlerts, setDocumentAlerts] = useState<DocumentAlert[]>([])
+  const [manualAlerts, setManualAlerts] = useState<ManualAlert[]>([])
   const [manualDeadlines, setManualDeadlines] = useState<ManualDeadlineItem[]>([])
   const [outstandingInvoices, setOutstandingInvoices] = useState<OutstandingInvoice[]>([])
 
@@ -80,6 +81,7 @@ export default function DashboardPage() {
 
       setCalendarAlerts(deadlinesData.calendarAlerts || [])
       setDocumentAlerts(deadlinesData.documentAlerts || [])
+      setManualAlerts(deadlinesData.manualAlerts || [])
       setOutstandingInvoices(outstandingData || [])
       setManualDeadlines(manualData || [])
     } catch {
@@ -94,14 +96,17 @@ export default function DashboardPage() {
     void fetchDashboardData()
   }, [fetchDashboardData])
 
-  // KPI 1: Urgent alerts (red calendar + overdue/red document alerts)
+  // KPI 1: Urgent alerts (red calendar + overdue/red document alerts + overdue/red manual alerts)
   const urgentAlertsCount = useMemo(() => {
     const redCalendar = calendarAlerts.filter((a) => a.severity === 'red').length
     const redOrOverdueDocs = documentAlerts.filter(
       (a) => a.severity === 'red' || a.severity === 'overdue'
     ).length
-    return redCalendar + redOrOverdueDocs
-  }, [calendarAlerts, documentAlerts])
+    const redOrOverdueManual = manualAlerts.filter(
+      (a) => a.severity === 'red' || a.severity === 'overdue'
+    ).length
+    return redCalendar + redOrOverdueDocs + redOrOverdueManual
+  }, [calendarAlerts, documentAlerts, manualAlerts])
 
   // KPI 2: Unpaid invoices metrics
   const unpaidMetrics = useMemo(() => {

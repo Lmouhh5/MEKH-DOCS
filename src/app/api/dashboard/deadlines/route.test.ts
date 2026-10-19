@@ -86,6 +86,20 @@ describe('GET /api/dashboard/deadlines', () => {
         machine: null,
         travailleur: null,
       },
+      {
+        id: 'doc-4',
+        title: 'Facture Payée',
+        documentType: 'FACTURE_VENTE',
+        module: 'CLIENTS',
+        issueDate: new Date('2025-10-10'),
+        dueDate: fiveDaysLater,
+        isPaid: true,
+        clientId: 'c1',
+        client: { nom: 'Societe Alpha' },
+        fournisseur: null,
+        machine: null,
+        travailleur: null,
+      },
     ]
 
     const mockManual = [

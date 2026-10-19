@@ -28,7 +28,8 @@ function getEntityName(doc: {
   return undefined
 }
 
-export async function GET() {
+export async function GET(_req: Request) {
+  void _req
   const session = await getServerSession(authOptions)
   if (!session) {
     return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
@@ -43,6 +44,7 @@ export async function GET() {
   const documents = await db.document.findMany({
     where: {
       dueDate: { not: null },
+      OR: [{ isPaid: false }, { isPaid: null }],
     },
     include: {
       client: true,
@@ -58,7 +60,7 @@ export async function GET() {
   const documentAlerts: DocumentAlert[] = []
 
   for (const doc of documents) {
-    if (!doc.dueDate) continue
+    if (!doc.dueDate || doc.isPaid === true) continue
 
     const isMachineAlert =
       doc.documentType === 'ASSURANCE' || doc.documentType === 'CONTROLE_TECHNIQUE'

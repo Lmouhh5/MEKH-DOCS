@@ -159,9 +159,9 @@ describe('DashboardPage', () => {
       expect(screen.getByTestId('kpi-upcoming-deadlines')).toBeInTheDocument()
     })
 
-    // Urgent alerts: G50 (red) + Assurance (overdue) = 2
+    // Urgent alerts: G50 (red) + Assurance (overdue) + Renouvellement agrément (red) = 3
     const urgentKpi = screen.getByTestId('kpi-urgent-alerts')
-    expect(urgentKpi).toHaveTextContent('2')
+    expect(urgentKpi).toHaveTextContent('3')
 
     // Outstanding invoices: 250 000,00 DZD and 1 facture
     const unpaidKpi = screen.getByTestId('kpi-outstanding-invoices')

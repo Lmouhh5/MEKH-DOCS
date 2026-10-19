@@ -3,7 +3,8 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import db from '@/lib/db'
 
-export async function GET() {
+export async function GET(_req: Request) {
+  void _req
   const session = await getServerSession(authOptions)
   if (!session) {
     return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
@@ -62,6 +63,13 @@ export async function POST(req: Request) {
 
   if (isNaN(parsedRed) || parsedRed < 0) {
     return NextResponse.json({ error: 'Seuil rouge invalide' }, { status: 400 })
+  }
+
+  if (parsedYellow < parsedRed) {
+    return NextResponse.json(
+      { error: 'Le seuil jaune doit être supérieur ou égal au seuil rouge' },
+      { status: 400 }
+    )
   }
 
   const created = await db.manualDeadline.create({

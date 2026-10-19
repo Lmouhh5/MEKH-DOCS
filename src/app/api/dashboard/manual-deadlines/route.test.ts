@@ -97,6 +97,23 @@ describe('Manual Deadlines API', () => {
       expect(json.error).toBe("Date d'échéance invalide")
     })
 
+    it('returns 400 if yellowDaysBefore is less than redDaysBefore', async () => {
+      const res = await POST(
+        authenticatedRequest('/api/dashboard/manual-deadlines', {
+          method: 'POST',
+          body: JSON.stringify({
+            label: 'Inspection',
+            dueDate: '2026-12-01',
+            yellowDaysBefore: 5,
+            redDaysBefore: 15,
+          }),
+        })
+      )
+      expect(res.status).toBe(400)
+      const json = await res.json()
+      expect(json.error).toBe('Le seuil jaune doit être supérieur ou égal au seuil rouge')
+    })
+
     it('creates manual deadline with default thresholds (30, 7) and returns 201', async () => {
       const createdItem = {
         id: 'md-new',

@@ -7,7 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest"
+    "test": "jest",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:migrate": "npx prisma migrate deploy",
+    "db:seed": "npx prisma db seed",
+    "setup": "docker compose up -d && npx prisma migrate deploy && npx prisma db seed"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1153.0",

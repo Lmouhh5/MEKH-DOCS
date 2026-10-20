@@ -9,4 +9,7 @@ export default defineConfig({
   datasource: {
     url: process.env.DATABASE_URL || 'postgresql://user:password@localhost:5432/erp_db',
   },
+  migrations: {
+    seed: 'npx ts-node prisma/seed.ts',
+  },
 })

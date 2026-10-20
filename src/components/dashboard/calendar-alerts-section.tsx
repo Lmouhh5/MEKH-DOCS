@@ -87,10 +87,10 @@ export function CalendarAlertsSection({ alerts, className }: CalendarAlertsSecti
                   key={`${alert.type}-${idx}`}
                   data-testid={`calendar-alert-${alert.type}`}
                   className={cn(
-                    'p-4 rounded-lg border transition-all flex flex-col justify-between gap-3 shadow-xs',
+                    'p-4 rounded border transition-all flex flex-col justify-between gap-3 shadow-xs',
                     isRed
-                      ? 'border-red-500/30 bg-red-500/5 dark:bg-red-950/20'
-                      : 'border-amber-500/30 bg-amber-500/5 dark:bg-amber-950/20'
+                      ? 'border-l-4 border-l-red-600 border-red-500/30 bg-red-500/5 dark:bg-red-950/20'
+                      : 'border-l-4 border-l-amber-600 border-amber-500/30 bg-amber-500/5 dark:bg-amber-950/20'
                   )}
                 >
                   <div className="flex items-start justify-between gap-2">

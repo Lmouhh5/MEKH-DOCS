@@ -82,7 +82,7 @@ export function TopBar({ user }: TopBarProps) {
           >
             <Menu className="size-5" />
           </SheetTrigger>
-          <SheetContent side="left" className="p-0 w-72 flex flex-col gap-0">
+          <SheetContent side="left" className="p-0 w-72 flex flex-col gap-0 bg-[#18181B] border-r border-zinc-800 text-zinc-100">
             <SheetTitle className="sr-only">Menu de navigation</SheetTitle>
             <SidebarBrand />
             <SidebarNav onNavigate={() => setMobileMenuOpen(false)} />
@@ -113,6 +113,13 @@ export function TopBar({ user }: TopBarProps) {
             )
           })}
         </nav>
+      </div>
+
+      {/* Middle: Institutional Badge */}
+      <div className="hidden lg:flex items-center gap-2 px-3 py-1 bg-amber-500/10 border border-amber-500/20 rounded text-[11px] font-mono text-amber-800">
+        <span className="font-semibold uppercase tracking-wider">Exercice Fiscal 2026</span>
+        <span className="text-amber-400">·</span>
+        <span className="font-sans text-muted-foreground">SARL Carrières &amp; Travaux</span>
       </div>
 
       {/* Right: User Email, Role Badge, Sign Out */}

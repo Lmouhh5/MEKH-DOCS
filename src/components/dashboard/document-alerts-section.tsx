@@ -95,7 +95,12 @@ export function DocumentAlertsSection({
                       setSelectedDocumentId(item.documentId)
                     }
                   }}
-                  className="p-3.5 hover:bg-muted/40 transition-colors cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 select-none"
+                  className={cn(
+                    'p-3.5 hover:bg-muted/40 transition-colors cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 select-none',
+                    isOverdue || isRed
+                      ? 'border-l-4 border-l-red-600 bg-red-500/5'
+                      : 'border-l-4 border-l-amber-600 bg-amber-500/5'
+                  )}
                 >
                   <div className="flex flex-col gap-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2">

@@ -25,7 +25,6 @@ export default function LoginPage() {
     e.preventDefault()
     setError(null)
     setLoading(true)
-
     try {
       const res = await signIn('credentials', {
         email,
@@ -48,14 +47,25 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4 bg-muted/30">
-      <Card className="w-full max-w-md shadow-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold tracking-tight">
+    <div className="flex min-h-screen items-center justify-center p-4 bg-background">
+      <Card className="w-full max-w-md shadow-lg border border-border overflow-hidden">
+        {/* Industrial hazard stripe bar across top of login card */}
+        <div
+          className="h-2 w-full bg-[repeating-linear-gradient(45deg,#d97706,#d97706_10px,#18181b_10px,#18181b_20px)]"
+          aria-hidden="true"
+        />
+        <CardHeader className="text-center pt-6">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <div className="w-2 h-5 bg-primary rounded-xs" />
+            <span className="font-mono text-xs font-bold tracking-widest text-primary uppercase">
+              ERP · TRAVAUX PUBLICS &amp; CARRIÈRES
+            </span>
+          </div>
+          <CardTitle className="text-2xl font-bold tracking-tight text-foreground">
             Connexion
           </CardTitle>
           <CardDescription>
-            Système de Gestion Documentaire & ERP
+            Système de Gestion Documentaire &amp; Régime Réel
           </CardDescription>
         </CardHeader>
         <CardContent>

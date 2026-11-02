@@ -25,6 +25,7 @@ enum Module {
   PERSONNEL
   TRESORERIE
   FISCALITE
+  ARCHIVES
 }
 
 enum DocumentType {
@@ -54,6 +55,7 @@ enum DocumentType {
   CNAS_DECLARATION
   CASNOS
   CACOBATPH
+  ARCHIVE_DOCUMENT
 }
 
 model User {
@@ -111,36 +113,54 @@ model Travailleur {
   updatedAt            DateTime   @updatedAt
 }
 
+model ArchiveCluster {
+  id          String           @id @default(cuid())
+  name        String
+  description String?
+  parentId    String?
+  parent      ArchiveCluster?  @relation("ClusterHierarchy", fields: [parentId], references: [id], onDelete: Restrict)
+  children    ArchiveCluster[] @relation("ClusterHierarchy")
+  documents   Document[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([parentId])
+  @@index([name])
+}
+
 model Document {
-  id               String         @id @default(cuid())
+  id               String          @id @default(cuid())
   title            String
   documentType     DocumentType
   module           Module
   issueDate        DateTime
   dueDate          DateTime?
-  amount           Decimal?       @db.Decimal(15, 2)
+  amount           Decimal?        @db.Decimal(15, 2)
   isPaid           Boolean?
   physicalLocation String?
   notes            String?
   fileKey          String
   clientId         String?
-  client           Client?        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  client           Client?         @relation(fields: [clientId], references: [id], onDelete: Cascade)
   fournisseurId    String?
-  fournisseur      Fournisseur?   @relation(fields: [fournisseurId], references: [id], onDelete: Cascade)
+  fournisseur      Fournisseur?    @relation(fields: [fournisseurId], references: [id], onDelete: Cascade)
   machineId        String?
-  machine          Machine?       @relation(fields: [machineId], references: [id], onDelete: Cascade)
+  machine          Machine?        @relation(fields: [machineId], references: [id], onDelete: Cascade)
   travailleurId    String?
-  travailleur      Travailleur?   @relation(fields: [travailleurId], references: [id], onDelete: Cascade)
-  linkedTo         DocumentLink[] @relation("DocumentA")
-  linkedFrom       DocumentLink[] @relation("DocumentB")
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
+  travailleur      Travailleur?    @relation(fields: [travailleurId], references: [id], onDelete: Cascade)
+  archiveClusterId String?
+  archiveCluster   ArchiveCluster? @relation(fields: [archiveClusterId], references: [id], onDelete: Restrict)
+  linkedTo         DocumentLink[]  @relation("DocumentA")
+  linkedFrom       DocumentLink[]  @relation("DocumentB")
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
 
   @@index([module])
   @@index([documentType])
   @@index([issueDate])
   @@index([dueDate])
   @@index([isPaid])
+  @@index([archiveClusterId])
 }
 
 model DocumentLink {

@@ -44,6 +44,7 @@ export async function GET(_req: Request) {
   const documents = await db.document.findMany({
     where: {
       dueDate: { not: null },
+      module: { not: 'ARCHIVES' },
       OR: [{ isPaid: false }, { isPaid: null }],
     },
     include: {

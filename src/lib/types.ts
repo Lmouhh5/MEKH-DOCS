@@ -8,6 +8,7 @@ export interface DocumentSummary {
   amount?: number;
   isPaid?: boolean;
   entityName?: string;
+  archiveCluster?: { id: string; name: string } | null;
 }
 
 export interface ArchiveClusterWithCounts {

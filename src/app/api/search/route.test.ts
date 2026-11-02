@@ -151,7 +151,7 @@ describe('GET /api/search', () => {
     expect(res.status).toBe(200)
   })
 
-  it('filters by entity text across client, fournisseur, machine, travailleur, and title', async () => {
+  it('filters by entity text across client, fournisseur, machine, travailleur, archiveCluster, and title', async () => {
     ;(db.document.findMany as jest.Mock).mockImplementationOnce(async ({ where }) => {
       expect(where.OR).toEqual(
         expect.arrayContaining([
@@ -162,6 +162,7 @@ describe('GET /api/search', () => {
           expect.objectContaining({ machine: { marque: { contains: 'alpha', mode: 'insensitive' } } }),
           expect.objectContaining({ machine: { matricule: { contains: 'alpha', mode: 'insensitive' } } }),
           expect.objectContaining({ travailleur: { nom: { contains: 'alpha', mode: 'insensitive' } } }),
+          expect.objectContaining({ archiveCluster: { name: { contains: 'alpha', mode: 'insensitive' } } }),
         ])
       )
       return [mockDocs[0]]
@@ -197,6 +198,9 @@ describe('GET /api/search', () => {
         fournisseur: true,
         machine: true,
         travailleur: true,
+        archiveCluster: {
+          select: { id: true, name: true },
+        },
       })
       return mockDocs
     })
@@ -205,6 +209,70 @@ describe('GET /api/search', () => {
     expect(res.status).toBe(200)
     const data = await res.json()
     expect(data.length).toBe(3)
+  })
+
+  it('filters by ARCHIVES module and includes archiveCluster info with entityName', async () => {
+    const mockArchiveDoc = {
+      id: 'doc-arch-1',
+      title: 'Contrat Archive 2015',
+      documentType: 'ARCHIVE_DOCUMENT',
+      module: 'ARCHIVES',
+      issueDate: new Date('2015-06-01T00:00:00.000Z'),
+      dueDate: null,
+      amount: null,
+      isPaid: null,
+      fileKey: 'ARCHIVES/cl-1/contrat.pdf',
+      clientId: null,
+      fournisseurId: null,
+      machineId: null,
+      travailleurId: null,
+      archiveClusterId: 'cl-1',
+      client: null,
+      fournisseur: null,
+      machine: null,
+      travailleur: null,
+      archiveCluster: { id: 'cl-1', name: 'Contrats Historiques' },
+    }
+
+    ;(db.document.findMany as jest.Mock).mockImplementationOnce(async ({ where, include }) => {
+      expect(where.module).toBe('ARCHIVES')
+      expect(include.archiveCluster).toEqual({ select: { id: true, name: true } })
+      return [mockArchiveDoc]
+    })
+
+    const res = await GET(authenticatedRequest('/api/search?module=ARCHIVES'))
+    expect(res.status).toBe(200)
+    const data = await res.json()
+    expect(data.length).toBe(1)
+    expect(data[0].module).toBe('ARCHIVES')
+    expect(data[0].entityName).toBe('Contrats Historiques')
+    expect(data[0].archiveCluster).toEqual({ id: 'cl-1', name: 'Contrats Historiques' })
+  })
+
+  it('returns "Archive" as entityName when module is ARCHIVES but archiveCluster is null', async () => {
+    const mockArchiveDoc = {
+      id: 'doc-arch-2',
+      title: 'Document orphelin',
+      documentType: 'ARCHIVE_DOCUMENT',
+      module: 'ARCHIVES',
+      issueDate: new Date('2015-06-01T00:00:00.000Z'),
+      dueDate: null,
+      amount: null,
+      isPaid: null,
+      fileKey: 'ARCHIVES/orphelin.pdf',
+      client: null,
+      fournisseur: null,
+      machine: null,
+      travailleur: null,
+      archiveCluster: null,
+    }
+
+    ;(db.document.findMany as jest.Mock).mockResolvedValueOnce([mockArchiveDoc])
+
+    const res = await GET(authenticatedRequest('/api/search?module=ARCHIVES'))
+    expect(res.status).toBe(200)
+    const data = await res.json()
+    expect(data[0].entityName).toBe('Archive')
   })
 
   it('maps results to DocumentSummary format with entityName, signedUrl, and numeric amount', async () => {

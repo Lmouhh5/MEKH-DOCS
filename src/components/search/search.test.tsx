@@ -131,6 +131,15 @@ describe('SearchFilters', () => {
 
     expect(mockReplace).toHaveBeenCalledWith('/recherche')
   })
+
+  it('allows filtering by ARCHIVES module in module dropdown', async () => {
+    render(<SearchFilters />)
+    const moduleSelect = screen.getByLabelText(/module/i)
+    expect(screen.getByRole('option', { name: 'Archives' })).toBeInTheDocument()
+
+    fireEvent.change(moduleSelect, { target: { value: 'ARCHIVES' } })
+    expect(mockReplace).toHaveBeenCalledWith('/recherche?module=ARCHIVES')
+  })
 })
 
 describe('SearchResults', () => {
@@ -223,6 +232,33 @@ describe('SearchResults', () => {
     fireEvent.click(screen.getByText('Fermer'))
     await waitFor(() => {
       expect(screen.queryByTestId('mock-detail-panel')).not.toBeInTheDocument()
+    })
+  })
+
+  it('allows filtering by ARCHIVES module and displays archive cluster info', async () => {
+    const archiveDocs = [
+      {
+        id: 'doc-arch-1',
+        title: 'Bilan Fiscal 2018',
+        documentType: 'ARCHIVE_DOCUMENT',
+        module: 'ARCHIVES',
+        issueDate: '2018-12-31T00:00:00.000Z',
+        entityName: 'Archives Fiscales 2018',
+      },
+    ]
+
+    ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: async () => archiveDocs,
+    })
+
+    mockSearchParams = new URLSearchParams('module=ARCHIVES')
+    render(<SearchResults />)
+
+    await waitFor(() => {
+      expect(screen.getByText('Bilan Fiscal 2018')).toBeInTheDocument()
+      expect(screen.getByText('Archives Fiscales 2018')).toBeInTheDocument()
     })
   })
 })

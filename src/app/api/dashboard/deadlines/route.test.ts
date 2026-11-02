@@ -145,4 +145,22 @@ describe('GET /api/dashboard/deadlines', () => {
     expect(json.manualAlerts[0].id).toBe('man-1')
     expect(json.manualAlerts[0].severity).toBe('red')
   })
+
+  it('excludes documents from the ARCHIVES module from deadlines query', async () => {
+    ;(db.document.findMany as jest.Mock).mockImplementationOnce(async ({ where }) => {
+      expect(where.module).toEqual({ not: 'ARCHIVES' })
+      return []
+    })
+    ;(db.manualDeadline.findMany as jest.Mock).mockResolvedValueOnce([])
+
+    const res = await GET(authenticatedRequest())
+    expect(res.status).toBe(200)
+    expect(db.document.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          module: { not: 'ARCHIVES' },
+        }),
+      })
+    )
+  })
 })

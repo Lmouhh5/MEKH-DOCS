@@ -51,7 +51,7 @@ export async function GET(req: Request) {
 
   // If tree requested, return full nested tree structure
   if (isTree) {
-    function buildTree(pId: string | null = null): any[] {
+    const buildTree = (pId: string | null = null): any[] => {
       const children = childrenByParent.get(pId) || []
       return children.map((c) => ({
         id: c.id,

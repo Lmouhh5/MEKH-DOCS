@@ -13,6 +13,8 @@ function getEntityName(doc: {
   fournisseur?: { nom: string } | null
   machine?: { machineId?: string | null; marque?: string | null; matricule?: string | null } | null
   travailleur?: { nom: string } | null
+  archiveCluster?: { name: string } | null
+  module?: string
 }): string | undefined {
   if (doc.client?.nom) return doc.client.nom
   if (doc.fournisseur?.nom) return doc.fournisseur.nom
@@ -23,6 +25,8 @@ function getEntityName(doc: {
     return doc.machine.machineId || doc.machine.marque || doc.machine.matricule || undefined
   }
   if (doc.travailleur?.nom) return doc.travailleur.nom
+  if (doc.archiveCluster?.name) return doc.archiveCluster.name
+  if (doc.module === 'ARCHIVES') return 'Archive'
   return undefined
 }
 
@@ -77,6 +81,7 @@ export async function GET(req: Request) {
       { machine: { marque: { contains: entity, mode: 'insensitive' } } },
       { machine: { matricule: { contains: entity, mode: 'insensitive' } } },
       { travailleur: { nom: { contains: entity, mode: 'insensitive' } } },
+      { archiveCluster: { name: { contains: entity, mode: 'insensitive' } } },
     ]
   }
 
@@ -87,6 +92,12 @@ export async function GET(req: Request) {
       fournisseur: true,
       machine: true,
       travailleur: true,
+      archiveCluster: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
     },
     orderBy: {
       issueDate: 'desc',
@@ -121,6 +132,7 @@ export async function GET(req: Request) {
         fournisseur: doc.fournisseur || undefined,
         machine: doc.machine || undefined,
         travailleur: doc.travailleur || undefined,
+        archiveCluster: doc.archiveCluster || undefined,
       }
     })
   )

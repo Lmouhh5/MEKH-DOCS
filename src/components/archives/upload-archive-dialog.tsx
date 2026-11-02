@@ -21,7 +21,7 @@ export interface UploadArchiveDialogProps {
   onOpenChange: (open: boolean) => void
   clusterId: string
   clusterName?: string
-  onSuccess?: (newDoc?: any) => void
+  onSuccess?: (newDoc?: unknown) => void
 }
 
 export function UploadArchiveDialog({
@@ -203,7 +203,7 @@ export function UploadArchiveDialog({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label htmlFor="archive-upload-issue-date">
-                Date d'émission <span className="text-destructive">*</span>
+                Date d&apos;émission <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="archive-upload-issue-date"
@@ -214,7 +214,7 @@ export function UploadArchiveDialog({
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="archive-upload-due-date">Date d'échéance</Label>
+              <Label htmlFor="archive-upload-due-date">Date d&apos;échéance</Label>
               <Input
                 id="archive-upload-due-date"
                 type="date"

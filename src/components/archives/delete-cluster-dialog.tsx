@@ -74,7 +74,7 @@ export function DeleteClusterDialog({
           <p className="font-medium">Attention : action irréversible</p>
           <p className="text-muted-foreground">
             La suppression échouera si le dossier contient encore des documents ou sous-dossiers.
-            Veuillez d'abord les déplacer ou les supprimer.
+            Veuillez d&apos;abord les déplacer ou les supprimer.
           </p>
         </div>
 

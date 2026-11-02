@@ -152,7 +152,7 @@ export function MoveDocumentDialog({
             <DialogTitle>Déplacer le document</DialogTitle>
           </div>
           <DialogDescription>
-            Déplacer « {documentTitle} » vers un autre dossier d'archive.
+            Déplacer « {documentTitle} » vers un autre dossier d&apos;archive.
           </DialogDescription>
         </DialogHeader>
 
@@ -165,7 +165,7 @@ export function MoveDocumentDialog({
             {loading ? (
               <div className="flex items-center justify-center py-8 text-xs text-muted-foreground gap-2">
                 <Loader2Icon className="size-4 animate-spin" />
-                <span>Chargement de l'arborescence...</span>
+                <span>Chargement de l&apos;arborescence...</span>
               </div>
             ) : flatClusters.length === 0 ? (
               <p className="text-xs text-muted-foreground text-center py-6 italic">

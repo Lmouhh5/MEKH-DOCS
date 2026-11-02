@@ -21,7 +21,7 @@ export interface CreateClusterDialogProps {
   onOpenChange: (open: boolean) => void
   parentId?: string | null
   parentName?: string | null
-  onSuccess?: (cluster?: any) => void
+  onSuccess?: (cluster?: unknown) => void
   onSubmit?: (data: { name: string; description: string; parentId?: string | null }) => void | Promise<void>
 }
 
@@ -67,9 +67,10 @@ export function CreateClusterDialog({
           setSubmitting(false)
         }
         onOpenChange(false)
-      } catch (err: any) {
+      } catch (err: unknown) {
         setSubmitting(false)
-        toast.error(err?.message || 'Erreur lors de la création du dossier')
+        const msg = err instanceof Error ? err.message : 'Erreur lors de la création du dossier'
+        toast.error(msg)
       }
       return
     }

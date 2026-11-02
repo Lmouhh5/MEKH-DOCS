@@ -45,7 +45,19 @@ export async function deleteFile(key: string): Promise<void> {
   await minioClient.removeObject(BUCKET, key)
 }
 
-export function generateKey(module: string, entityId: string | null | undefined, filename: string): string {
-  const sanitizedFilename = filename.replace(/[^a-zA-Z0-9.-]/g, '_')
+export function generateKey(module: string, filename: string): string
+export function generateKey(module: string, entityId: string | null | undefined, filename: string): string
+export function generateKey(
+  module: string,
+  entityIdOrFilename: string | null | undefined,
+  maybeFilename?: string
+): string {
+  let entityId: string | null | undefined = entityIdOrFilename
+  let filename = maybeFilename
+  if (maybeFilename === undefined && typeof entityIdOrFilename === 'string') {
+    entityId = null
+    filename = entityIdOrFilename
+  }
+  const sanitizedFilename = (filename || 'document.pdf').replace(/[^a-zA-Z0-9.-]/g, '_')
   return `${module}/${entityId ?? 'global'}/${Date.now()}-${sanitizedFilename}`
 }

@@ -5,6 +5,7 @@ export const Module = {
   PERSONNEL: 'Personnel',
   TRESORERIE: 'Trésorerie',
   FISCALITE: 'Fiscalité',
+  ARCHIVES: 'Archives',
 } as const
 
 export type ModuleKey = keyof typeof Module
@@ -37,6 +38,7 @@ export const DocumentType = {
   CNAS_DECLARATION: 'Déclaration CNAS',
   CASNOS: 'CASNOS',
   CACOBATPH: 'CACOBATPH',
+  ARCHIVE_DOCUMENT: "Document d'archive",
 } as const
 
 export type DocumentTypeKey = keyof typeof DocumentType
@@ -59,6 +61,7 @@ export const DOCUMENT_TYPES_BY_MODULE: Record<ModuleKey, DocumentTypeKey[]> = {
     'CASNOS',
     'CACOBATPH',
   ],
+  ARCHIVES: ['ARCHIVE_DOCUMENT'],
 }
 
 export const ALERT_THRESHOLDS = {

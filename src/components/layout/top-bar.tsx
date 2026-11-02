@@ -26,6 +26,7 @@ const SECTION_LABELS: Record<string, string> = {
   personnel: 'Personnel',
   tresorerie: 'Trésorerie & Banque',
   fiscalite: 'Fiscalité & Administration',
+  archives: 'Archives',
 }
 
 export function getBreadcrumbs(pathname: string): { label: string; href?: string }[] {

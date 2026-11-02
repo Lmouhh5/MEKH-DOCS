@@ -66,6 +66,13 @@ describe('getBreadcrumbs helper', () => {
     ])
   })
 
+  it('generates breadcrumbs for /archives and subpaths', () => {
+    expect(getBreadcrumbs('/archives')).toEqual([
+      { label: 'ERP', href: '/' },
+      { label: 'Archives' },
+    ])
+  })
+
   it('returns nested breadcrumbs for sub-paths', () => {
     expect(getBreadcrumbs('/clients/nouveau')).toEqual([
       { label: 'ERP', href: '/' },
@@ -92,7 +99,13 @@ describe('Sidebar Component', () => {
     expect(screen.getByText('Travaux Publics & Concassage')).toBeInTheDocument()
   })
 
-  it('renders all 8 navigation items', () => {
+  it('contains 9 navigation items including Archives', () => {
+    render(<Sidebar />)
+    expect(NAV_ITEMS).toHaveLength(9)
+    expect(screen.getByText('Archives')).toBeInTheDocument()
+  })
+
+  it('renders all navigation items', () => {
     render(<Sidebar />)
     for (const item of NAV_ITEMS) {
       const link = screen.getByRole('link', { name: new RegExp(item.label, 'i') })

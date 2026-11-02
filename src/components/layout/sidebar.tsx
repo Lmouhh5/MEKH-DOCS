@@ -12,6 +12,7 @@ import {
   UserCheck,
   Landmark,
   FileText,
+  Archive,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -61,6 +62,11 @@ export const NAV_ITEMS: NavItem[] = [
     label: 'Fiscalité & Administration',
     href: '/fiscalite',
     icon: FileText,
+  },
+  {
+    label: 'Archives',
+    href: '/archives',
+    icon: Archive,
   },
 ]
 

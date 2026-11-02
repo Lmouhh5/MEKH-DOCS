@@ -281,8 +281,8 @@ export function DocumentLinkWidget({
             <div className="max-h-[300px] overflow-y-auto flex flex-col gap-2 pr-1">
               {searching ? (
                 <div className="flex items-center justify-center p-6 text-xs text-muted-foreground gap-2">
-                  <Loader2Icon className="size-4 animate-spin" />
-                  <span>Recherche en cours...</span>
+                  <Loader2Icon className="size-4 motion-safe:animate-spin" />
+                  <span>Recherche en cours…</span>
                 </div>
               ) : candidateList.length === 0 ? (
                 <p className="text-xs text-muted-foreground text-center py-6 italic">
@@ -318,7 +318,7 @@ export function DocumentLinkWidget({
                       onClick={() => void handleLinkDocument(candidate)}
                     >
                       {actionInProgressId === candidate.id ? (
-                        <Loader2Icon className="size-3 animate-spin" />
+                        <Loader2Icon className="size-3 motion-safe:animate-spin" />
                       ) : (
                         'Lier'
                       )}

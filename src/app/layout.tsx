@@ -1,17 +1,27 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
+import { Figtree, Instrument_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-sans",
-  weight: "100 900",
+const instrumentSans = Instrument_Sans({
+  subsets: ["latin"],
+  variable: "--font-display-face",
+  weight: ["400", "500"],
+  display: "swap",
 });
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
+
+const figtree = Figtree({
+  subsets: ["latin"],
+  variable: "--font-body-face",
+  weight: ["400", "500"],
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-outlier-face",
+  weight: ["400", "500"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -25,10 +35,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" className={cn("font-sans", geistSans.variable, geistMono.variable)}>
-      <body className="antialiased font-sans">
-        {children}
-      </body>
+    <html
+      lang="fr"
+      className={cn(
+        "font-sans",
+        instrumentSans.variable,
+        figtree.variable,
+        jetbrainsMono.variable
+      )}
+    >
+      <body className="antialiased font-sans">{children}</body>
     </html>
   );
 }

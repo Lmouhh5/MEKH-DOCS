@@ -38,13 +38,13 @@ export default function NouveauDocumentFiscalitePage() {
       </div>
 
       {/* Note d'information sur les échéances déclaratives */}
-      <div className="flex items-start gap-3 p-4 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-900 dark:text-amber-200 text-xs">
-        <div className="p-1 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 shrink-0 mt-0.5">
+      <div className="flex items-start gap-3 p-4 rounded-lg bg-accent border border-primary/20 text-ink text-xs">
+        <div className="p-1 rounded-full bg-accent text-primary shrink-0 mt-0.5">
           <CalendarClockIcon className="size-4" />
         </div>
         <div className="flex flex-col gap-1 leading-relaxed">
           <span className="font-semibold text-sm text-foreground flex items-center gap-1.5">
-            <InfoIcon className="size-3.5 text-amber-600 dark:text-amber-400" />
+            <InfoIcon className="size-3.5 text-primary" />
             Rappel des échéances périodiques
           </span>
           <p className="text-muted-foreground">

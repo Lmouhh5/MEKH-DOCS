@@ -1,77 +1,347 @@
+/* Hallmark · shape: app screen · genre: atmospheric · theme: Ribbon (by request) · redesign: full
+ * nav: kept sidebar shell · signature: échéances ledger as level rows · states: loading, empty, error, full · ribbon: two-in-the-morning
+ * axes: dark/grotesk-sans/chromatic-teal · posture: committed · contrast: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P1 H2 E2 S1 R2 V1 · weakest: S, app density over marketing panels · waived: none */
+/* Hallmark · answered: industrial amber replaced by Ribbon night dial · hazard stripes retired */
+/* Hallmark · waive 26b · not a form control, no aria-disabled anywhere · widgets are display panels */
+@import "./tokens.css";
+@import "./base.css" layer(base);
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    /* Architectural warm off-white canvas (#F9F8F6) */
-    --background: 40 18% 97.5%;
-    /* Deep soot iron charcoal text (#1A1B22) */
-    --foreground: 233 14% 12%;
-
-    /* Crisp pure white elevation for cards & modules */
-    --card: 0 0% 100%;
-    --card-foreground: 233 14% 12%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 233 14% 12%;
-
-    /* Industrial Safety Amber / Quarry Orange (#D97706 / #B15F00) */
-    --primary: 32.1 94.6% 43.7%;
-    --primary-foreground: 0 0% 100%;
-
-    /* Technical stone / container low (#F4F2FD / #F4F4F5) */
-    --secondary: 240 5% 94%;
-    --secondary-foreground: 233 14% 12%;
-
-    --muted: 240 5% 94%;
-    --muted-foreground: 240 4% 46%;
-
-    /* High-vis warning amber tint (#FEF3C7) */
-    --accent: 48 96% 89%;
-    --accent-foreground: 28 73% 26%;
-
-    /* Critical Statutory Red (#DC2626) */
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 100%;
-
-    /* Precision razor-thin perimeter boundaries (#E5E7EB) */
-    --border: 220 13% 91%;
-    --input: 240 5% 84%;
-    --ring: 32.1 94.6% 43.7%;
-
-    /* Sharp architectural corners (4px - 6px) */
-    --radius: 0.375rem;
+    --background: var(--color-paper);
+    --foreground: var(--color-ink);
+    --card: var(--color-paper-2);
+    --card-foreground: var(--color-ink);
+    --popover: var(--color-paper-2);
+    --popover-foreground: var(--color-ink);
+    --primary: var(--color-accent);
+    --primary-foreground: var(--color-accent-ink);
+    --secondary: var(--color-paper-3);
+    --secondary-foreground: var(--color-ink-2);
+    --muted: var(--color-paper-3);
+    --muted-foreground: var(--color-muted);
+    --accent: var(--color-accent-soft);
+    --accent-foreground: var(--color-ink);
+    --destructive: var(--color-error);
+    --destructive-foreground: var(--color-ink);
+    --border: var(--color-rule);
+    --input: var(--color-rule);
+    --ring: var(--color-focus);
+    --radius: var(--radius-part);
   }
 
-  .dark {
-    --background: 240 10% 8%;
-    --foreground: 0 0% 98%;
-    --card: 240 5.9% 10%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 5.9% 10%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 32.1 94.6% 43.7%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 32.1 94.6% 43.7%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 32.1 94.6% 43.7%;
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-body);
+    background-image:
+      radial-gradient(120% 80% at 50% -10%, var(--color-night-glow), transparent 55%),
+      linear-gradient(180deg, var(--color-paper), var(--color-band));
+    background-attachment: fixed;
+  }
+
+  /* App screens: unlock marketing head measure from base.css */
+  main h1,
+  [data-app-shell] h1 {
+    max-width: none;
+    font-size: var(--text-2xl);
+    font-weight: 500;
+    letter-spacing: var(--tracking-display);
+  }
+
+  main h2,
+  [data-app-shell] h2 {
+    max-width: none;
+    font-size: var(--text-section);
+    font-weight: 500;
+  }
+
+  main h3,
+  [data-app-shell] h3 {
+    max-width: none;
+    font-weight: 500;
   }
 }
 
-@layer base {
-  * {
-    @apply border-border;
+@layer components {
+  .ribbon-panel {
+    border-radius: var(--radius-card);
+    background: linear-gradient(180deg, var(--color-paper-2), var(--color-paper-3));
+    box-shadow: var(--edge-light), var(--shadow-panel);
   }
-  body {
-    @apply bg-background text-foreground;
+
+  .ribbon-part {
+    border-radius: var(--radius-part);
+    background: linear-gradient(180deg, var(--metal-hi), var(--metal-lo));
+    box-shadow: var(--edge-light), var(--shadow-part);
+  }
+
+  .ribbon-hairline {
+    border-color: var(--color-rule);
+  }
+
+  .ribbon-night {
+    position: relative;
+    isolation: isolate;
+    background:
+      linear-gradient(180deg, var(--color-night-top) 0%, var(--color-night-mid) 55%, var(--color-night-land) 100%);
+  }
+
+  .ribbon-night::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+      repeating-linear-gradient(
+        90deg,
+        transparent 0,
+        transparent 48px,
+        var(--color-rain) 48px,
+        var(--color-rain) 49px
+      ),
+      radial-gradient(2px 2px at 12% 78%, var(--color-window-1), transparent 40%),
+      radial-gradient(1.5px 1.5px at 28% 82%, var(--color-window-2), transparent 40%),
+      radial-gradient(2px 2px at 61% 76%, var(--color-window-3), transparent 40%),
+      radial-gradient(1px 1px at 79% 84%, var(--color-window-4), transparent 40%);
+    opacity: 0.9;
+    animation: ribbon-rain 28s linear infinite;
+  }
+
+  .ribbon-night > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .ribbon-grain {
+    position: relative;
+  }
+
+  .ribbon-grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    opacity: 0.35;
+    mix-blend-mode: soft-light;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+    background-size: 160px;
+  }
+
+  @keyframes ribbon-rain {
+    from { transform: translateY(0); }
+    to { transform: translateY(48px); }
+  }
+
+  @keyframes ribbon-widget-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes ribbon-level-fill {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+  }
+
+  @keyframes ribbon-breathe {
+    0%,
+    100% {
+      opacity: 0.45;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  .ribbon-widget {
+    animation: ribbon-widget-in var(--dur-long) var(--ease-out) both;
+    animation-delay: calc(var(--i, 0) * 70ms);
+  }
+
+  .ribbon-widget__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-md);
+    padding: var(--space-lg) var(--space-lg) var(--space-md);
+    border-bottom: var(--rule-hair) solid var(--color-rule);
+  }
+
+  .ribbon-widget__body {
+    padding: var(--space-md) var(--space-lg) var(--space-lg);
+  }
+
+  .ribbon-empty {
+    display: grid;
+    grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
+    gap: var(--space-lg);
+    align-items: center;
+    padding: var(--space-lg);
+    border-radius: var(--radius-part);
+    background: linear-gradient(180deg, var(--color-paper-3), var(--color-paper-2));
+    box-shadow: var(--edge-light);
+  }
+
+  .ribbon-empty__meters {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .ribbon-empty__meter {
+    display: grid;
+    grid-template-columns: 3.5rem 1fr 2rem;
+    gap: var(--space-xs);
+    align-items: center;
+  }
+
+  .ribbon-empty__label {
+    font-size: var(--text-xs);
+    color: var(--color-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .ribbon-empty__track {
+    height: var(--space-2xs);
+    border-radius: var(--radius-pill);
+    background: color-mix(in oklab, var(--color-rule) 80%, transparent);
+    overflow: hidden;
+    box-shadow: var(--shadow-inset-track);
+  }
+
+  .ribbon-empty__fill {
+    display: block;
+    height: 100%;
+    width: max(var(--level, 0%), var(--space-3xs));
+    transform-origin: left center;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--color-accent-soft), var(--color-accent));
+    opacity: 0.55;
+    animation: ribbon-level-fill var(--dur-long) var(--ease-out) both;
+    animation-delay: calc(120ms + var(--i, 0) * 90ms);
+  }
+
+  .ribbon-empty__value {
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    font-variant-numeric: tabular-nums;
+    color: var(--color-muted);
+    text-align: right;
+  }
+
+  .ribbon-empty__copy h3 {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: 500;
+    letter-spacing: var(--tracking-display);
+    color: var(--color-ink);
+    max-width: none;
+    margin: 0;
+  }
+
+  .ribbon-empty__copy p {
+    margin: var(--space-2xs) 0 0;
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+    max-width: 48ch;
+  }
+
+  .ribbon-empty__pulse {
+    width: var(--space-xs);
+    height: var(--space-xs);
+    border-radius: var(--radius-pill);
+    background: var(--color-accent);
+    animation: ribbon-breathe 3.6s var(--ease-in-out) infinite;
+  }
+
+  .ribbon-row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+    padding: var(--space-sm) 0;
+    border-bottom: var(--rule-hair) solid var(--color-rule);
+    transition: background-color var(--dur-micro) var(--ease-out),
+      transform var(--dur-micro) var(--ease-out);
+  }
+
+  .ribbon-row:last-child {
+    border-bottom: 0;
+  }
+
+  .ribbon-row[role="button"] {
+    cursor: pointer;
+    margin-inline: calc(var(--space-md) * -1);
+    padding-inline: var(--space-md);
+    border-radius: var(--radius-part);
+  }
+
+  .ribbon-row[role="button"]:hover {
+    background: color-mix(in oklab, var(--color-paper-3) 70%, transparent);
+  }
+
+  .ribbon-row[role="button"]:active {
+    transform: translateY(1px);
+  }
+
+  .ribbon-level-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    min-height: var(--space-lg);
+    padding: 0 var(--space-sm);
+    border-radius: var(--radius-pill);
+    border: var(--rule-hair) solid var(--color-rule);
+    background: var(--color-paper-3);
+    font-size: var(--text-xs);
+    font-variant-numeric: tabular-nums;
+    color: var(--color-ink-2);
+  }
+
+  .ribbon-level-chip--lit {
+    border-color: color-mix(in oklab, var(--color-accent) 45%, var(--color-rule));
+    color: var(--color-accent);
+    background: var(--color-accent-soft);
+  }
+
+  .ribbon-level-chip--warn {
+    border-color: color-mix(in oklab, var(--color-error) 45%, var(--color-rule));
+    color: var(--color-error);
+    background: color-mix(in oklab, var(--color-error) 12%, transparent);
+  }
+
+  @media (max-width: 40rem) {
+    .ribbon-empty {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ribbon-night::before,
+    .ribbon-empty__pulse {
+      animation: none;
+    }
+
+    .ribbon-widget,
+    .ribbon-empty__fill {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
   }
 }

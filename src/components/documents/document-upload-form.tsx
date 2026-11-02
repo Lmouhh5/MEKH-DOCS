@@ -250,7 +250,7 @@ export function DocumentUploadForm({
       </div>
 
       <Button type="submit" disabled={isSubmitting} className="mt-2 w-full">
-        {isSubmitting ? 'Téléversement en cours...' : 'Téléverser le document'}
+        {isSubmitting ? 'Téléversement en cours…' : 'Téléverser le document'}
       </Button>
     </form>
   )

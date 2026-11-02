@@ -69,10 +69,10 @@ export function PaidToggle({
       <Label
         htmlFor={toggleId}
         className={cn(
-          'text-xs font-semibold uppercase tracking-wider cursor-pointer select-none transition-colors',
+          'text-xs font-semibold  tracking-normal cursor-pointer select-none transition-colors',
           paid
             ? 'text-emerald-600 dark:text-emerald-400'
-            : 'text-amber-600 dark:text-amber-400'
+            : 'text-primary'
         )}
       >
         {paid ? 'Payé' : 'Impayé'}

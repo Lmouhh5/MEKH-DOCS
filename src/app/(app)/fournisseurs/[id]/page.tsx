@@ -105,7 +105,7 @@ export default function SupplierProfilePage() {
   if (loading) {
     return (
       <div className="container mx-auto max-w-5xl px-4 py-16 flex flex-col items-center justify-center gap-3 text-muted-foreground">
-        <Loader2Icon className="size-8 animate-spin text-primary" />
+        <Loader2Icon className="size-8 motion-safe:animate-spin text-primary" />
         <p className="text-sm">Chargement du profil fournisseur...</p>
       </div>
     )

@@ -129,7 +129,7 @@ export default function PersonnelPage() {
       {/* Content */}
       {loading ? (
         <div className="flex flex-col items-center justify-center p-12 text-muted-foreground gap-3">
-          <Loader2Icon className="size-8 animate-spin text-primary" />
+          <Loader2Icon className="size-8 motion-safe:animate-spin text-primary" />
           <p className="text-sm">Chargement du personnel...</p>
         </div>
       ) : workers.length === 0 ? (

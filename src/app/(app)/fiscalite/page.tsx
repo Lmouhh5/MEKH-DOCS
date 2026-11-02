@@ -2,11 +2,17 @@
 
 import React, { useEffect, useState, useCallback, useMemo } from 'react'
 import Link from 'next/link'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { buttonVariants } from '@/components/ui/button'
 import { DocumentDetailPanel } from '@/components/documents/document-detail-panel'
 import { DocumentCard } from '@/components/documents/document-card'
+import {
+  RibbonEmpty,
+  RibbonKpiStrip,
+  RibbonMetaChip,
+  RibbonSeg,
+  RibbonSegButton,
+  RibbonWidget,
+} from '@/components/dashboard/ribbon-widget'
 import { DOCUMENT_TYPE_LABELS, DocumentTypeKey } from '@/lib/constants'
 import { DocumentSummary } from '@/lib/types'
 import { cn } from '@/lib/utils'
@@ -199,21 +205,15 @@ export default function FiscalitePage() {
   }, [fiscaliteDocs])
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-8 flex flex-col gap-8">
-      {/* En-tête principal */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/50 pb-5">
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-lg bg-primary/10 text-primary">
-            <FileTextIcon className="size-6" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">
-              Fiscalité & Déclarations Administratives
-            </h1>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              Coffre-fort numérique des déclarations fiscales algériennes (G50, G4, État 104) et cotisations sociales (CNAS, CASNOS, CACOBATPH).
-            </p>
-          </div>
+    <div className="mx-auto max-w-7xl flex flex-col gap-8">
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 border-b border-rule pb-5">
+        <div>
+          <h1 className="font-display text-2xl sm:text-3xl font-medium tracking-tight text-ink">
+            Fiscalité & Déclarations Administratives
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1.5 max-w-2xl">
+            Coffre-fort numérique des déclarations fiscales algériennes (G50, G4, État 104) et cotisations sociales (CNAS, CASNOS, CACOBATPH).
+          </p>
         </div>
 
         <Link
@@ -225,169 +225,115 @@ export default function FiscalitePage() {
         </Link>
       </div>
 
-      {/* Cartes métriques récapitulatives */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {/* Total Documents */}
-        <Card className="border border-border/60 bg-card">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-              Total Déclarations
-            </CardTitle>
-            <div className="p-2 rounded-full bg-primary/10 text-primary">
-              <LayersIcon className="size-4" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">
-              {fiscaliteDocs.length}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              <span className="font-semibold text-foreground">{distinctTypesCount}</span> catégorie{distinctTypesCount > 1 ? 's' : ''} archivée{distinctTypesCount > 1 ? 's' : ''}
-            </p>
-          </CardContent>
-        </Card>
+      <RibbonKpiStrip
+        items={[
+          {
+            label: 'Total Déclarations',
+            value: fiscaliteDocs.length,
+            icon: <LayersIcon className="size-4" />,
+            hint: (
+              <>
+                <span className="font-medium text-ink tabular-nums">{distinctTypesCount}</span>{' '}
+                catégorie{distinctTypesCount > 1 ? 's' : ''} archivée
+                {distinctTypesCount > 1 ? 's' : ''}
+              </>
+            ),
+          },
+          {
+            label: 'Obligations Fiscales',
+            value: fiscalCount,
+            icon: <Building2Icon className="size-4" />,
+            hint: 'G50, G4, G12, G40, État 104, RC',
+          },
+          {
+            label: 'Organismes Sociaux',
+            value: socialCount,
+            icon: <ShieldCheckIcon className="size-4" />,
+            hint: 'CNAS, CASNOS, CACOBATPH',
+          },
+        ]}
+      />
 
-        {/* Obligations Fiscales */}
-        <Card className="border border-border/60 bg-card">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-              Obligations Fiscales
-            </CardTitle>
-            <div className="p-2 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400">
-              <Building2Icon className="size-4" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">
-              {fiscalCount}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              G50, G4, G12, G40, État 104, RC
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* Organismes Sociaux */}
-        <Card className="border border-border/60 bg-card">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-              Organismes Sociaux
-            </CardTitle>
-            <div className="p-2 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-              <ShieldCheckIcon className="size-4" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">
-              {socialCount}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              CNAS, CASNOS, CACOBATPH
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Section Principale: Archive documentaire par type */}
-      <section aria-labelledby="archive-heading" className="flex flex-col gap-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-t border-border/50 pt-6">
-          <div>
-            <h2 id="archive-heading" className="text-lg font-bold tracking-tight text-foreground">
-              Archives Fiscales & Déclaratives
-            </h2>
-            <p className="text-xs text-muted-foreground">
-              Documents regroupés par nature de déclaration avec date du dernier dépôt.
-            </p>
-          </div>
-
-          {/* Filtre par catégorie (Tous / Obligations Fiscales / Organismes Sociaux) */}
-          <div className="flex items-center gap-1.5 bg-muted/40 p-1 rounded-lg border border-border/60 self-start sm:self-auto">
-            <FilterIcon className="size-3.5 text-muted-foreground ml-1.5 shrink-0" />
-            <button
-              type="button"
+      <RibbonWidget
+        index={1}
+        title="Archives Fiscales & Déclaratives"
+        description="Documents regroupés par nature de déclaration avec date du dernier dépôt."
+        icon={<FileTextIcon className="size-4" />}
+        action={
+          <RibbonSeg>
+            <FilterIcon className="size-3.5 text-muted-foreground ml-2 shrink-0" />
+            <RibbonSegButton
+              active={selectedCategory === 'ALL'}
               onClick={() => setSelectedCategory('ALL')}
-              className={cn(
-                'px-2.5 py-1 text-xs rounded-md font-medium transition-colors',
-                selectedCategory === 'ALL'
-                  ? 'bg-card text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
             >
               Tous ({fiscaliteDocs.length})
-            </button>
-            <button
-              type="button"
+            </RibbonSegButton>
+            <RibbonSegButton
+              active={selectedCategory === 'FISCAL'}
               onClick={() => setSelectedCategory('FISCAL')}
-              className={cn(
-                'px-2.5 py-1 text-xs rounded-md font-medium transition-colors',
-                selectedCategory === 'FISCAL'
-                  ? 'bg-card text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
             >
               Obligations Fiscales ({fiscalCount})
-            </button>
-            <button
-              type="button"
+            </RibbonSegButton>
+            <RibbonSegButton
+              active={selectedCategory === 'SOCIAL'}
               onClick={() => setSelectedCategory('SOCIAL')}
-              className={cn(
-                'px-2.5 py-1 text-xs rounded-md font-medium transition-colors',
-                selectedCategory === 'SOCIAL'
-                  ? 'bg-card text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
             >
               Organismes Sociaux ({socialCount})
-            </button>
-          </div>
-        </div>
-
-        {/* État de chargement */}
+            </RibbonSegButton>
+          </RibbonSeg>
+        }
+      >
         {loading ? (
-          <div className="flex flex-col items-center justify-center p-12 text-muted-foreground gap-3 border rounded-lg bg-card/40">
-            <Loader2Icon className="size-7 animate-spin text-primary" />
-            <p className="text-xs">Chargement des documents fiscaux & sociaux...</p>
+          <div className="flex flex-col items-center justify-center p-12 text-muted-foreground gap-3">
+            <Loader2Icon className="size-7 motion-safe:animate-spin text-primary" />
+            <p className="text-sm">Chargement des documents fiscaux & sociaux…</p>
           </div>
         ) : error ? (
-          <div className="p-6 flex items-center justify-center gap-2 text-xs text-destructive border border-dashed rounded-lg bg-destructive/5">
+          <div className="p-6 flex items-center justify-center gap-2 text-sm text-destructive">
             <AlertCircleIcon className="size-4" />
             <span>{error}</span>
           </div>
         ) : fiscaliteDocs.length === 0 ? (
-          <div className="flex flex-col items-center justify-center p-12 text-center border border-dashed rounded-lg bg-muted/10 text-muted-foreground my-2">
-            <div className="p-3 rounded-full bg-muted/40 mb-3 text-muted-foreground/80">
-              <FileTextIcon className="size-6" />
-            </div>
-            <p className="text-sm font-medium">Aucun document fiscal ou social enregistré</p>
-            <p className="text-xs text-muted-foreground/70 mt-1 max-w-md">
-              Téléversez vos déclarations G50, liasses fiscales, attestations de mise à jour CNAS ou registres de commerce.
-            </p>
-            <Link
-              href="/fiscalite/nouveau-document"
-              className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'mt-4 gap-1.5')}
-            >
-              <PlusIcon className="size-3.5" />
-              Ajouter un premier document
-            </Link>
-          </div>
+          <RibbonEmpty
+            title="Aucun document fiscal ou social enregistré"
+            description="Téléversez vos déclarations G50, liasses fiscales, attestations de mise à jour CNAS ou registres de commerce."
+            meters={[
+              { label: 'Fiscal', level: 0 },
+              { label: 'Social', level: 0 },
+              { label: 'Archive', level: 0 },
+            ]}
+            action={
+              <Link
+                href="/fiscalite/nouveau-document"
+                className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-1.5')}
+              >
+                <PlusIcon className="size-3.5" />
+                Ajouter un premier document
+              </Link>
+            }
+          />
         ) : groupedDocuments.length === 0 ? (
-          <div className="p-8 text-center border border-dashed rounded-lg bg-muted/10 text-muted-foreground">
-            <p className="text-sm font-medium">Aucun document dans cette catégorie</p>
-            <p className="text-xs text-muted-foreground/80 mt-1">
-              Aucun document ne correspond au filtre sélectionné.
-            </p>
-            <button
-              type="button"
-              onClick={() => setSelectedCategory('ALL')}
-              className="mt-3 text-xs text-primary font-medium hover:underline"
-            >
-              Réinitialiser le filtre
-            </button>
-          </div>
+          <RibbonEmpty
+            title="Aucun document dans cette catégorie"
+            description="Aucun document ne correspond au filtre sélectionné."
+            meters={[
+              { label: 'Filtre', level: 0 },
+              { label: 'Types', level: 0 },
+              { label: 'Dossiers', level: 0 },
+            ]}
+            action={
+              <button
+                type="button"
+                onClick={() => setSelectedCategory('ALL')}
+                className="text-[13px] text-primary font-medium hover:underline active:translate-y-px focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring rounded-part"
+              >
+                Réinitialiser le filtre
+              </button>
+            }
+          />
         ) : (
-          /* Liste des groupes de documents */
-          <div className="flex flex-col gap-6">
-            {groupedDocuments.map((group) => {
+          <div className="flex flex-col gap-4">
+            {groupedDocuments.map((group, i) => {
               const isCollapsed = Boolean(collapsedGroups[group.typeKey])
               const isFiscal = group.category === 'FISCAL'
 
@@ -395,9 +341,9 @@ export default function FiscalitePage() {
                 <div
                   key={group.typeKey}
                   data-testid={`group-section-${group.typeKey}`}
-                  className="rounded-lg border border-border/70 bg-card overflow-hidden shadow-sm"
+                  className="ribbon-part overflow-hidden ribbon-widget"
+                  style={{ ['--i' as string]: i }}
                 >
-                  {/* En-tête du groupe (collapsible) */}
                   <div
                     role="button"
                     tabIndex={0}
@@ -409,17 +355,10 @@ export default function FiscalitePage() {
                         toggleGroupCollapse(group.typeKey)
                       }
                     }}
-                    className="p-4 bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 select-none"
+                    className="p-4 hover:bg-paper-3/40 active:translate-y-px transition-colors duration-micro cursor-pointer flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 select-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                   >
                     <div className="flex items-center gap-3">
-                      <div
-                        className={cn(
-                          'p-2 rounded-lg shrink-0',
-                          isFiscal
-                            ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
-                            : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                        )}
-                      >
+                      <div className="ribbon-part size-9 shrink-0 flex items-center justify-center text-primary">
                         {isFiscal ? (
                           <Building2Icon className="size-4" />
                         ) : (
@@ -428,25 +367,17 @@ export default function FiscalitePage() {
                       </div>
 
                       <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="text-sm font-bold text-foreground">
+                        <h3 className="font-display text-sm font-medium text-ink tracking-tight max-w-none">
                           {group.label}
                         </h3>
-                        <Badge
-                          variant="secondary"
-                          className={cn(
-                            'text-[10px] font-semibold tracking-wide',
-                            isFiscal
-                              ? 'bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/20'
-                              : 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20'
-                          )}
-                        >
+                        <RibbonMetaChip lit>
                           {group.documents.length}{' '}
                           {group.documents.length > 1 ? 'documents' : 'document'}
-                        </Badge>
+                        </RibbonMetaChip>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-4 text-xs text-muted-foreground self-end sm:self-auto">
+                    <div className="flex items-center gap-4 text-[13px] text-muted-foreground self-end sm:self-auto">
                       {group.latestDate && (
                         <div className="flex items-center gap-1.5 font-medium">
                           <CalendarIcon className="size-3.5 text-muted-foreground" />
@@ -454,7 +385,7 @@ export default function FiscalitePage() {
                         </div>
                       )}
 
-                      <div className="p-1 rounded-md hover:bg-muted text-muted-foreground">
+                      <div className="p-1 rounded-part text-muted-foreground">
                         {isCollapsed ? (
                           <ChevronDownIcon className="size-4" aria-label="Déplier" />
                         ) : (
@@ -464,9 +395,8 @@ export default function FiscalitePage() {
                     </div>
                   </div>
 
-                  {/* Contenu du groupe : cartes des documents */}
                   {!isCollapsed && (
-                    <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-3 border-t border-border/40 bg-background/50">
+                    <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-3 border-t border-rule">
                       {group.documents.map((doc) => (
                         <DocumentCard
                           key={doc.id}
@@ -481,7 +411,7 @@ export default function FiscalitePage() {
             })}
           </div>
         )}
-      </section>
+      </RibbonWidget>
 
       {/* Panneau latéral de détails du document */}
       <DocumentDetailPanel

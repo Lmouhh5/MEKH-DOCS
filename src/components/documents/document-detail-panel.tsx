@@ -213,7 +213,7 @@ export function DocumentDetailPanel({
                   <span
                     className={
                       doc.dueDate
-                        ? 'font-semibold text-amber-600 dark:text-amber-400'
+                        ? 'font-semibold text-primary'
                         : 'text-muted-foreground'
                     }
                   >
@@ -278,7 +278,7 @@ export function DocumentDetailPanel({
               {/* Visionneuse PDF */}
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <h3 className="text-xs font-semibold  tracking-normal text-muted-foreground">
                     Aperçu du document PDF
                   </h3>
                   {(doc.signedUrl || doc.url) && (

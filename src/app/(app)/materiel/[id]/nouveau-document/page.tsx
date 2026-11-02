@@ -40,7 +40,7 @@ export default function NouveauDocumentMaterielPage() {
       </div>
 
       {/* Due Date Enforcement Notice */}
-      <div className="flex items-start gap-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-4 text-xs text-amber-800 dark:text-amber-300">
+      <div className="flex items-start gap-3 rounded-lg border border-primary/30 bg-accent p-4 text-xs text-primary">
         <InfoIcon className="size-5 shrink-0 text-amber-600 dark:text-amber-400 mt-0.5" />
         <div className="space-y-1">
           <p className="font-semibold text-sm">

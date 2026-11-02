@@ -76,7 +76,7 @@ function getDueDateStatus(dueDateStr?: string | null) {
     return {
       status: 'WARNING',
       label: `Expire dans ${diffDays} j`,
-      color: 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30',
+      color: 'bg-accent text-primary border-primary/30',
     }
   }
   return {
@@ -170,7 +170,7 @@ export default function MachineProfilePage() {
         return (
           <Badge
             variant="outline"
-            className="bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30 text-sm px-3 py-1 font-semibold"
+            className="bg-accent text-primary border-primary/30 text-sm px-3 py-1 font-semibold"
           >
             En maintenance
           </Badge>
@@ -192,7 +192,7 @@ export default function MachineProfilePage() {
   if (loading) {
     return (
       <div className="container mx-auto max-w-5xl px-4 py-16 flex flex-col items-center justify-center gap-3 text-muted-foreground">
-        <Loader2Icon className="size-8 animate-spin text-primary" />
+        <Loader2Icon className="size-8 motion-safe:animate-spin text-primary" />
         <p className="text-sm">Chargement de la fiche matériel...</p>
       </div>
     )
@@ -288,7 +288,7 @@ export default function MachineProfilePage() {
         {/* Assurance Card */}
         <Card className={cn(
           'border',
-          latestAssurance ? 'border-border/60' : 'border-amber-500/30 bg-amber-500/5'
+          latestAssurance ? 'border-border/60' : 'border-primary/30 bg-accent'
         )}>
           <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
             <div className="flex items-center gap-2">
@@ -325,7 +325,7 @@ export default function MachineProfilePage() {
         {/* Contrôle Technique Card */}
         <Card className={cn(
           'border',
-          latestControle ? 'border-border/60' : 'border-amber-500/30 bg-amber-500/5'
+          latestControle ? 'border-border/60' : 'border-primary/30 bg-accent'
         )}>
           <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
             <div className="flex items-center gap-2">

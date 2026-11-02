@@ -44,7 +44,7 @@ export function SearchFilters({ className = '' }: SearchFiltersProps) {
       aria-label="Filtres de recherche"
     >
       <div className="flex items-center justify-between pb-1 border-b border-border/40">
-        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        <div className="flex items-center gap-2 text-xs font-semibold  tracking-normal text-muted-foreground">
           <FilterIcon className="size-3.5 text-primary" />
           <span>Filtres avancés</span>
         </div>

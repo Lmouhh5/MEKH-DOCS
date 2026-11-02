@@ -66,9 +66,8 @@ export function TopBar({ user }: TopBarProps) {
   const userEmail = user?.email || 'admin@erp.local'
 
   return (
-    <header className="sticky top-0 z-20 flex h-16 w-full items-center justify-between border-b border-border bg-card/80 px-4 md:px-6 backdrop-blur-md">
-      {/* Left: Mobile menu toggle + Breadcrumbs / Page Context */}
-      <div className="flex items-center gap-3">
+    <header className="sticky top-0 z-20 flex h-14 w-full items-center justify-between border-b border-rule bg-paper-2/90 px-4 md:px-6 backdrop-blur-sm">
+      <div className="flex items-center gap-3 min-w-0">
         <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
           <SheetTrigger
             render={
@@ -82,29 +81,35 @@ export function TopBar({ user }: TopBarProps) {
           >
             <Menu className="size-5" />
           </SheetTrigger>
-          <SheetContent side="left" className="p-0 w-72 flex flex-col gap-0 bg-[#18181B] border-r border-zinc-800 text-zinc-100">
+          <SheetContent
+            side="left"
+            className="p-0 w-72 flex flex-col gap-0 ribbon-panel border-r border-rule text-ink rounded-none"
+          >
             <SheetTitle className="sr-only">Menu de navigation</SheetTitle>
             <SidebarBrand />
             <SidebarNav onNavigate={() => setMobileMenuOpen(false)} />
           </SheetContent>
         </Sheet>
 
-        <nav aria-label="Fil d'Ariane" className="flex items-center gap-1.5 text-sm">
+        <nav aria-label="Fil d'Ariane" className="flex items-center gap-1.5 text-sm min-w-0">
           {breadcrumbs.map((crumb, idx) => {
             const isLast = idx === breadcrumbs.length - 1
             return (
               <React.Fragment key={`${crumb.label}-${idx}`}>
                 {idx > 0 && (
-                  <ChevronRight className="size-3.5 text-muted-foreground/60 shrink-0" aria-hidden="true" />
+                  <ChevronRight
+                    className="size-3.5 text-muted-foreground/60 shrink-0"
+                    aria-hidden="true"
+                  />
                 )}
                 {isLast ? (
-                  <span className="font-semibold text-foreground tracking-tight">
+                  <span className="font-display font-medium text-ink tracking-tight truncate">
                     {crumb.label}
                   </span>
                 ) : (
                   <Link
                     href={crumb.href || '/'}
-                    className="text-muted-foreground hover:text-foreground transition-colors"
+                    className="text-muted-foreground hover:text-ink transition-colors duration-micro truncate"
                   >
                     {crumb.label}
                   </Link>
@@ -115,20 +120,23 @@ export function TopBar({ user }: TopBarProps) {
         </nav>
       </div>
 
-      {/* Middle: Institutional Badge */}
-      <div className="hidden lg:flex items-center gap-2 px-3 py-1 bg-amber-500/10 border border-amber-500/20 rounded text-[11px] font-mono text-amber-800">
-        <span className="font-semibold uppercase tracking-wider">Exercice Fiscal 2026</span>
-        <span className="text-amber-400">·</span>
-        <span className="font-sans text-muted-foreground">SARL Carrières &amp; Travaux</span>
+      <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-pill border border-rule bg-paper-3/60 text-[12px]">
+        <span className="font-medium text-ink">Exercice Fiscal 2026</span>
+        <span className="text-muted-foreground" aria-hidden="true">
+          /
+        </span>
+        <span className="text-muted-foreground">SARL Carrières &amp; Travaux</span>
       </div>
 
-      {/* Right: User Email, Role Badge, Sign Out */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 shrink-0">
         <div className="flex flex-col items-end text-right">
-          <span className="text-xs font-medium text-foreground leading-none" data-testid="user-email">
+          <span
+            className="text-xs font-medium text-ink leading-none"
+            data-testid="user-email"
+          >
             {userEmail}
           </span>
-          <Badge variant="secondary" className="mt-1 text-[10px] font-semibold">
+          <Badge variant="secondary" className="mt-1 text-[11px] font-medium">
             Administrateur
           </Badge>
         </div>

@@ -112,7 +112,7 @@ export function EntityDocumentList({
 
       {loading ? (
         <div className="flex items-center justify-center p-8 text-muted-foreground">
-          <Loader2Icon className="size-6 animate-spin mr-2" />
+          <Loader2Icon className="size-6 motion-safe:animate-spin mr-2" />
           <span>Chargement des documents...</span>
         </div>
       ) : (

@@ -1,0 +1,15 @@
+﻿{
+  "scanned": "2026-10-24",
+  "findings": {
+    "fonts": "Geist Sans + Geist Mono (next/font local, src/app/layout.tsx)",
+    "palette": "HSL shadcn tokens — warm off-white paper, industrial amber primary (globals.css :root)",
+    "motion": "tailwindcss-animate + tw-animate-css; no framer-motion",
+    "spacing": "Tailwind default + shadcn radius 0.375rem",
+    "framework": "Next.js 14 app router, React 18, shadcn/Base UI, Prisma",
+    "product": "French ERP document management (clients, fournisseurs, matériel, personnel, trésorerie, fiscalité)",
+    "shell": "Sidebar + TopBar app chrome behind next-auth",
+    "scope": "app screens"
+  },
+  "preserve": ["routes", "handlers", "forms", "test hooks", "next-auth session shell", "shadcn component APIs"],
+  "introduce": ["Ribbon theme tokens (Instrument Sans, Figtree, chromatic teal / night dial)", "app-scoped density and surfaces", "restrained motion on state"]
+}

@@ -1,11 +1,9 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
 import {
   Dialog,
   DialogContent,
@@ -14,13 +12,12 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog'
+import { RibbonEmpty, RibbonMetaChip, RibbonWidget } from '@/components/dashboard/ribbon-widget'
 import { toast } from 'sonner'
-import { cn } from '@/lib/utils'
 import {
   PlusIcon,
   Trash2Icon,
   CalendarCheck2Icon,
-  ClockIcon,
   Loader2Icon,
 } from 'lucide-react'
 
@@ -58,7 +55,6 @@ export function ManualDeadlineForm({
   const [submitting, setSubmitting] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
-  // Form states
   const [label, setLabel] = useState('')
   const [dueDate, setDueDate] = useState('')
   const [yellowDaysBefore, setYellowDaysBefore] = useState('30')
@@ -144,110 +140,100 @@ export function ManualDeadlineForm({
   }
 
   return (
-    <Card className={cn('border border-border/70 shadow-sm bg-card', className)}>
-      <CardHeader className="flex flex-row items-center justify-between pb-3">
-        <div className="flex items-center gap-2">
-          <div className="p-2 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">
-            <CalendarCheck2Icon className="size-5" />
-          </div>
-          <div>
-            <CardTitle className="text-base font-bold text-foreground">
-              Échéances Personnalisées
-            </CardTitle>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              Rappels et alertes sur mesure configurés par l&apos;entreprise
-            </p>
-          </div>
-        </div>
-
-        <Button
-          type="button"
-          size="sm"
-          onClick={handleOpenDialog}
-          className="gap-1.5"
-          data-testid="add-manual-deadline-btn"
-        >
-          <PlusIcon className="size-4" />
-          Nouvelle échéance
-        </Button>
-      </CardHeader>
-
-      <CardContent className="pt-2">
+    <>
+      <RibbonWidget
+        index={3}
+        className={className}
+        title="Échéances Personnalisées"
+        description="Rappels et alertes sur mesure configurés par l'entreprise"
+        icon={<CalendarCheck2Icon className="size-4" />}
+        action={
+          <Button
+            type="button"
+            size="sm"
+            onClick={handleOpenDialog}
+            className="gap-1.5"
+            data-testid="add-manual-deadline-btn"
+          >
+            <PlusIcon className="size-4" />
+            Nouvelle échéance
+          </Button>
+        }
+      >
         {manualDeadlines.length === 0 ? (
-          <div className="flex flex-col items-center justify-center p-8 text-center rounded-lg border border-dashed border-border/60 bg-muted/10 text-muted-foreground">
-            <div className="p-2.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 mb-2">
-              <ClockIcon className="size-5" />
-            </div>
-            <p className="text-sm font-medium text-foreground">
-              Aucune échéance personnalisée enregistrée
-            </p>
-            <p className="text-xs text-muted-foreground mt-1 max-w-sm">
-              Ajoutez vos propres rappels pour les audits, renouvellements de baux ou visites médicales.
-            </p>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleOpenDialog}
-              className="mt-4 gap-1.5"
-            >
-              <PlusIcon className="size-3.5" />
-              Créer une échéance
-            </Button>
-          </div>
+          <RibbonEmpty
+            title="Aucune échéance personnalisée enregistrée"
+            description="Ajoutez vos propres rappels pour les audits, renouvellements de baux ou visites médicales."
+            meters={[
+              { label: 'Rappels', level: 0 },
+              { label: 'Audits', level: 0 },
+              { label: 'Baux', level: 0 },
+            ]}
+            action={
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleOpenDialog}
+                className="gap-1.5"
+              >
+                <PlusIcon className="size-3.5" />
+                Créer une échéance
+              </Button>
+            }
+          />
         ) : (
-          <div className="divide-y divide-border/50 rounded-lg border border-border/60 overflow-hidden bg-card">
-            {manualDeadlines.map((item) => (
-              <div
+          <ul className="m-0 p-0 list-none">
+            {manualDeadlines.map((item, i) => (
+              <li
                 key={item.id}
                 data-testid={`manual-deadline-row-${item.id}`}
-                className="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-muted/40 transition-colors"
+                className="ribbon-row ribbon-widget"
+                style={{ ['--i' as string]: i }}
               >
-                <div className="flex flex-col gap-1 min-w-0">
-                  <span className="font-semibold text-sm text-foreground truncate">
-                    {item.label}
-                  </span>
-                  <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-                    <span className="font-medium text-foreground/80">
-                      Échéance : {formatDate(item.dueDate)}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex flex-col gap-1 min-w-0">
+                    <span className="font-display font-medium text-sm text-ink truncate">
+                      {item.label}
                     </span>
-                    <span>•</span>
-                    <span>
-                      Alertes à {item.yellowDaysBefore}j (jaune) et {item.redDaysBefore}j (rouge)
-                    </span>
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-muted-foreground">
+                      <span className="font-medium text-ink-2">
+                        Échéance : {formatDate(item.dueDate)}
+                      </span>
+                      <span>
+                        Alertes à {item.yellowDaysBefore}j (jaune) et {item.redDaysBefore}j (rouge)
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 self-end sm:self-center">
+                    <RibbonMetaChip>Personnalisé</RibbonMetaChip>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-sm"
+                      disabled={deletingId === item.id}
+                      onClick={() => handleDelete(item.id)}
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                      aria-label={`Supprimer ${item.label}`}
+                      data-testid={`delete-manual-deadline-${item.id}`}
+                    >
+                      {deletingId === item.id ? (
+                        <Loader2Icon className="size-3.5 motion-safe:animate-spin" />
+                      ) : (
+                        <Trash2Icon className="size-3.5" />
+                      )}
+                    </Button>
                   </div>
                 </div>
-
-                <div className="flex items-center gap-2 self-end sm:self-center">
-                  <Badge variant="outline" className="text-[10px]">
-                    Personnalisé
-                  </Badge>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon-sm"
-                    disabled={deletingId === item.id}
-                    onClick={() => handleDelete(item.id)}
-                    className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                    aria-label={`Supprimer ${item.label}`}
-                    data-testid={`delete-manual-deadline-${item.id}`}
-                  >
-                    {deletingId === item.id ? (
-                      <Loader2Icon className="size-3.5 animate-spin" />
-                    ) : (
-                      <Trash2Icon className="size-3.5" />
-                    )}
-                  </Button>
-                </div>
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
         )}
-      </CardContent>
+      </RibbonWidget>
 
-      {/* Modal / Dialog de création d'échéance */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md ribbon-panel border-rule">
           <form onSubmit={handleSubmit}>
             <DialogHeader>
               <DialogTitle>Ajouter une échéance personnalisée</DialogTitle>
@@ -314,13 +300,13 @@ export function ManualDeadlineForm({
                 Annuler
               </Button>
               <Button type="submit" disabled={submitting}>
-                {submitting && <Loader2Icon className="size-4 animate-spin mr-1.5" />}
+                {submitting && <Loader2Icon className="size-4 motion-safe:animate-spin mr-1.5" />}
                 Enregistrer l&apos;échéance
               </Button>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
-    </Card>
+    </>
   )
 }

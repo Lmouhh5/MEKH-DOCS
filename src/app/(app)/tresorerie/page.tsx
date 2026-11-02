@@ -10,12 +10,18 @@ import {
   TableHead,
   TableCell,
 } from '@/components/ui/table'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { buttonVariants } from '@/components/ui/button'
 import { PaidToggle } from '@/components/documents/paid-toggle'
 import { DocumentDetailPanel } from '@/components/documents/document-detail-panel'
 import { DocumentList } from '@/components/documents/document-list'
+import {
+  RibbonEmpty,
+  RibbonKpiStrip,
+  RibbonMetaChip,
+  RibbonSeg,
+  RibbonSegButton,
+  RibbonWidget,
+} from '@/components/dashboard/ribbon-widget'
 import { DOCUMENT_TYPE_LABELS, DocumentTypeKey } from '@/lib/constants'
 import { DocumentSummary } from '@/lib/types'
 import { cn } from '@/lib/utils'
@@ -183,21 +189,15 @@ export default function TresoreriePage() {
   })
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-8 flex flex-col gap-8">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/50 pb-5">
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-lg bg-primary/10 text-primary">
-            <LandmarkIcon className="size-6" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">
-              Trésorerie & Banque
-            </h1>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              Gestion des relevés bancaires, flux financiers et rapprochement des factures impayées.
-            </p>
-          </div>
+    <div className="mx-auto max-w-7xl flex flex-col gap-8">
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 border-b border-rule pb-5">
+        <div>
+          <h1 className="font-display text-2xl sm:text-3xl font-medium tracking-tight text-ink">
+            Trésorerie & Banque
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1.5 max-w-2xl">
+            Gestion des relevés bancaires, flux financiers et rapprochement des factures impayées.
+          </p>
         </div>
 
         <Link
@@ -209,113 +209,73 @@ export default function TresoreriePage() {
         </Link>
       </div>
 
-      {/* Métriques clés de rapprochement */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {/* Créances clients */}
-        <Card className="border border-border/60 bg-card">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-              Créances Clients (Ventes)
-            </CardTitle>
-            <div className="p-2 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-              <ArrowDownLeftIcon className="size-4" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">
-              {formatDZD(totalSalesAmount)}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              <span className="font-semibold text-foreground">{unpaidSales.length}</span>{' '}
-              facture{unpaidSales.length > 1 ? 's' : ''} en attente d&apos;encaissement
-            </p>
-          </CardContent>
-        </Card>
+      <RibbonKpiStrip
+        items={[
+          {
+            label: 'Créances Clients (Ventes)',
+            value: formatDZD(totalSalesAmount),
+            icon: <ArrowDownLeftIcon className="size-4" />,
+            hint: (
+              <>
+                <span className="font-medium text-ink tabular-nums">{unpaidSales.length}</span>{' '}
+                facture{unpaidSales.length > 1 ? 's' : ''} en attente d&apos;encaissement
+              </>
+            ),
+          },
+          {
+            label: 'Dettes Fournisseurs (Achats)',
+            value: formatDZD(totalPurchasesAmount),
+            icon: <ArrowUpRightIcon className="size-4" />,
+            hint: (
+              <>
+                <span className="font-medium text-ink tabular-nums">{unpaidPurchases.length}</span>{' '}
+                facture{unpaidPurchases.length > 1 ? 's' : ''} en attente de décaissement
+              </>
+            ),
+          },
+          {
+            label: 'Solde Net Prévisionnel',
+            value: formatDZD(netBalance),
+            icon: <ScaleIcon className="size-4" />,
+            tone: netBalance < 0 ? 'warn' : 'default',
+            hint: `${unpaidSales.length + unpaidPurchases.length} facture(s) impayée(s) au total`,
+          },
+        ]}
+      />
 
-        {/* Dettes fournisseurs */}
-        <Card className="border border-border/60 bg-card">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-              Dettes Fournisseurs (Achats)
-            </CardTitle>
-            <div className="p-2 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400">
-              <ArrowUpRightIcon className="size-4" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">
-              {formatDZD(totalPurchasesAmount)}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              <span className="font-semibold text-foreground">{unpaidPurchases.length}</span>{' '}
-              facture{unpaidPurchases.length > 1 ? 's' : ''} en attente de décaissement
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* Solde net */}
-        <Card className="border border-border/60 bg-card">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-              Solde Net Prévisionnel
-            </CardTitle>
-            <div className="p-2 rounded-full bg-primary/10 text-primary">
-              <ScaleIcon className="size-4" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div
-              className={cn(
-                'text-2xl font-bold',
-                netBalance >= 0
-                  ? 'text-emerald-600 dark:text-emerald-400'
-                  : 'text-rose-600 dark:text-rose-400'
-              )}
-            >
-              {formatDZD(netBalance)}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {unpaidSales.length + unpaidPurchases.length} facture(s) impayée(s) au total
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Section 1: Factures Impayées & Rapprochement */}
-      <section aria-labelledby="reconciliation-heading" className="flex flex-col gap-4">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-          <div>
-            <h2 id="reconciliation-heading" className="text-lg font-bold tracking-tight text-foreground">
-              Factures Impayées & Rapprochement
-            </h2>
-            <p className="text-xs text-muted-foreground">
-              Rapprochement des créances clients et dettes fournisseurs nécessitant un règlement.
-            </p>
-          </div>
-          <Badge variant="outline" className="text-xs w-fit">
+      <RibbonWidget
+        index={1}
+        title="Factures Impayées & Rapprochement"
+        description="Rapprochement des créances clients et dettes fournisseurs nécessitant un règlement."
+        icon={<FileTextIcon className="size-4" />}
+        meta={
+          <RibbonMetaChip lit={outstandingDocs.length > 0}>
             {outstandingDocs.length} facture{outstandingDocs.length > 1 ? 's' : ''} à rapprocher
-          </Badge>
-        </div>
-
+          </RibbonMetaChip>
+        }
+      >
         {loadingOutstanding ? (
-          <div className="flex flex-col items-center justify-center p-12 text-muted-foreground gap-3 border rounded-lg bg-card/40">
-            <Loader2Icon className="size-7 animate-spin text-primary" />
-            <p className="text-xs">Chargement des factures impayées...</p>
+          <div className="flex flex-col items-center justify-center p-12 text-muted-foreground gap-3">
+            <Loader2Icon className="size-7 motion-safe:animate-spin text-primary" />
+            <p className="text-sm">Chargement des factures impayées…</p>
           </div>
         ) : outstandingError ? (
-          <div className="p-6 flex items-center justify-center gap-2 text-xs text-destructive border border-dashed rounded-lg bg-destructive/5">
+          <div className="p-6 flex items-center justify-center gap-2 text-sm text-destructive">
             <AlertCircleIcon className="size-4" />
             <span>{outstandingError}</span>
           </div>
         ) : outstandingDocs.length === 0 ? (
-          <div className="p-8 text-center border border-dashed rounded-lg bg-muted/10 text-muted-foreground">
-            <p className="text-sm font-medium">Aucune facture impayée</p>
-            <p className="text-xs text-muted-foreground/80 mt-1">
-              Toutes les factures clients et fournisseurs sont à jour de règlement.
-            </p>
-          </div>
+          <RibbonEmpty
+            title="Aucune facture impayée"
+            description="Toutes les factures clients et fournisseurs sont à jour de règlement."
+            meters={[
+              { label: 'Clients', level: 0 },
+              { label: 'Fournisseurs', level: 0 },
+              { label: 'Solde', level: 0 },
+            ]}
+          />
         ) : (
-          <div className="rounded-lg border border-border bg-card overflow-hidden shadow-sm">
+          <div className="overflow-x-auto rounded-part">
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/40">
@@ -339,40 +299,21 @@ export default function TresoreriePage() {
                     <TableRow
                       key={doc.id}
                       className={cn(
-                        'hover:bg-muted/30 transition-colors cursor-pointer',
-                        doc.isPaid && 'opacity-60 bg-muted/15'
+                        'border-rule hover:bg-paper-3/50 transition-colors duration-micro cursor-pointer',
+                        doc.isPaid && 'opacity-60'
                       )}
                       onClick={() => setSelectedDocumentId(doc.id)}
                     >
-                      {/* Type de document */}
-                      <TableCell className="text-xs">
-                        <Badge
-                          variant="secondary"
-                          className={cn(
-                            'text-[10px] font-medium tracking-wide',
-                            isClient
-                              ? 'bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/20'
-                              : 'bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-500/20'
-                          )}
-                        >
-                          {typeLabel}
-                        </Badge>
+                      <TableCell className="text-[13px]">
+                        <RibbonMetaChip lit={isClient}>{typeLabel}</RibbonMetaChip>
                       </TableCell>
 
-                      {/* Tiers */}
-                      <TableCell className="text-xs font-medium">
+                      <TableCell className="text-[13px] font-medium">
                         <div className="flex items-center gap-1.5">
-                          <span
-                            className={cn(
-                              'text-[10px] font-semibold px-1.5 py-0.5 rounded uppercase tracking-wider',
-                              isClient
-                                ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200'
-                                : 'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-200'
-                            )}
-                          >
+                          <RibbonMetaChip lit={isClient}>
                             {isClient ? 'Client' : 'Fournisseur'}
-                          </span>
-                          <span className="text-foreground truncate max-w-[180px]">{entity}</span>
+                          </RibbonMetaChip>
+                          <span className="text-ink truncate max-w-[180px]">{entity}</span>
                         </div>
                       </TableCell>
 
@@ -414,71 +355,46 @@ export default function TresoreriePage() {
             </Table>
           </div>
         )}
-      </section>
+      </RibbonWidget>
 
-      {/* Section 2: Documents Bancaires & Justificatifs */}
-      <section aria-labelledby="bank-documents-heading" className="flex flex-col gap-4">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-t border-border/50 pt-6">
-          <div>
-            <h2 id="bank-documents-heading" className="text-lg font-bold tracking-tight text-foreground">
-              Documents Bancaires & Justificatifs
-            </h2>
-            <p className="text-xs text-muted-foreground">
-              Relevés de comptes, bordereaux de versement et reçus de paiement bancaires.
-            </p>
-          </div>
-
-          {/* Filtre par type de document */}
-          <div className="flex items-center gap-1.5 bg-muted/40 p-1 rounded-lg border border-border/60 self-start sm:self-auto">
-            <FilterIcon className="size-3.5 text-muted-foreground ml-1.5 shrink-0" />
-            <button
-              type="button"
+      <RibbonWidget
+        index={2}
+        title="Documents Bancaires & Justificatifs"
+        description="Relevés de comptes, bordereaux de versement et reçus de paiement bancaires."
+        icon={<LandmarkIcon className="size-4" />}
+        action={
+          <RibbonSeg>
+            <FilterIcon className="size-3.5 text-muted-foreground ml-2 shrink-0" />
+            <RibbonSegButton
+              active={selectedTypeFilter === 'ALL'}
               onClick={() => setSelectedTypeFilter('ALL')}
-              className={cn(
-                'px-2.5 py-1 text-xs rounded-md font-medium transition-colors',
-                selectedTypeFilter === 'ALL'
-                  ? 'bg-card text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
             >
               Tous ({tresorerieDocs.length})
-            </button>
-            <button
-              type="button"
+            </RibbonSegButton>
+            <RibbonSegButton
+              active={selectedTypeFilter === 'RELEVE_BANCAIRE'}
               onClick={() => setSelectedTypeFilter('RELEVE_BANCAIRE')}
-              className={cn(
-                'px-2.5 py-1 text-xs rounded-md font-medium transition-colors',
-                selectedTypeFilter === 'RELEVE_BANCAIRE'
-                  ? 'bg-card text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
             >
               Relevés bancaires (
               {tresorerieDocs.filter((d) => d.documentType === 'RELEVE_BANCAIRE').length})
-            </button>
-            <button
-              type="button"
+            </RibbonSegButton>
+            <RibbonSegButton
+              active={selectedTypeFilter === 'RECU_PAIEMENT'}
               onClick={() => setSelectedTypeFilter('RECU_PAIEMENT')}
-              className={cn(
-                'px-2.5 py-1 text-xs rounded-md font-medium transition-colors',
-                selectedTypeFilter === 'RECU_PAIEMENT'
-                  ? 'bg-card text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
             >
               Reçus de paiement (
               {tresorerieDocs.filter((d) => d.documentType === 'RECU_PAIEMENT').length})
-            </button>
-          </div>
-        </div>
-
+            </RibbonSegButton>
+          </RibbonSeg>
+        }
+      >
         {loadingTresorerie ? (
-          <div className="flex flex-col items-center justify-center p-12 text-muted-foreground gap-3 border rounded-lg bg-card/40">
-            <Loader2Icon className="size-7 animate-spin text-primary" />
-            <p className="text-xs">Chargement des documents bancaires...</p>
+          <div className="flex flex-col items-center justify-center p-12 text-muted-foreground gap-3">
+            <Loader2Icon className="size-7 motion-safe:animate-spin text-primary" />
+            <p className="text-sm">Chargement des documents bancaires…</p>
           </div>
         ) : tresorerieError ? (
-          <div className="p-6 flex items-center justify-center gap-2 text-xs text-destructive border border-dashed rounded-lg bg-destructive/5">
+          <div className="p-6 flex items-center justify-center gap-2 text-sm text-destructive">
             <AlertCircleIcon className="size-4" />
             <span>{tresorerieError}</span>
           </div>
@@ -488,7 +404,7 @@ export default function TresoreriePage() {
             onSelect={(id) => setSelectedDocumentId(id)}
           />
         )}
-      </section>
+      </RibbonWidget>
 
       {/* Panneau de détails du document */}
       <DocumentDetailPanel

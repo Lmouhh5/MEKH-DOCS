@@ -61,7 +61,7 @@ export function DocumentCard({
       onClick={() => onSelect?.(document.id)}
       onKeyDown={handleKeyDown}
       className={cn(
-        'group transition-all duration-200 hover:shadow-md border border-border/60 bg-card text-card-foreground',
+        'group transition-colors duration-200 hover:shadow-md border border-border/60 bg-card text-card-foreground',
         onSelect && 'cursor-pointer hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
         className
       )}
@@ -85,7 +85,7 @@ export function DocumentCard({
           <Badge
             variant={document.isPaid ? 'default' : 'destructive'}
             className={cn(
-              'shrink-0 text-[10px] font-medium tracking-wide uppercase',
+              'shrink-0 text-[10px] font-medium tracking-normal ',
               document.isPaid
                 ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
                 : 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border-rose-500/30'
@@ -113,7 +113,7 @@ export function DocumentCard({
           )}
 
           {formattedDueDate && (
-            <div className="flex items-center gap-1 text-amber-600 dark:text-amber-400 font-medium">
+            <div className="flex items-center gap-1 text-primary font-medium">
               <CalendarIcon className="size-3 shrink-0" />
               <span>Échéance: {formattedDueDate}</span>
             </div>

@@ -94,7 +94,7 @@ export default function MaterielPage() {
         return (
           <Badge
             variant="outline"
-            className="bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30 font-medium"
+            className="bg-accent text-primary border-primary/30 font-medium"
           >
             En maintenance
           </Badge>
@@ -169,7 +169,7 @@ export default function MaterielPage() {
       {/* Content */}
       {loading ? (
         <div className="flex flex-col items-center justify-center p-12 text-muted-foreground gap-3">
-          <Loader2Icon className="size-8 animate-spin text-primary" />
+          <Loader2Icon className="size-8 motion-safe:animate-spin text-primary" />
           <p className="text-sm">Chargement du parc matériel...</p>
         </div>
       ) : machines.length === 0 ? (

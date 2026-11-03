@@ -5,7 +5,7 @@ import { POST as uploadDoc } from './route'
 import { PATCH as moveDoc } from './[id]/move/route'
 import { DELETE as deleteDoc, GET as getDoc } from './[id]/route'
 import db from '@/lib/db'
-import { uploadFile, deleteFile, generateKey } from '@/lib/minio'
+import { uploadFile, deleteFile } from '@/lib/minio'
 import { Prisma } from '@prisma/client'
 
 let mockSession: { user: { id: string; email: string; role: string } } | null = null
@@ -218,7 +218,7 @@ describe('Archive Documents API', () => {
       jest.spyOn(req, 'formData').mockResolvedValue(formData)
       const originalGet = formData.get.bind(formData)
       jest.spyOn(formData, 'get').mockImplementation((key: string) => {
-        if (key === 'file') return mockFile as any
+        if (key === 'file') return mockFile as unknown as File
         return originalGet(key)
       })
 

@@ -151,14 +151,14 @@ describe('Archive Clusters API', () => {
       const data = await res.json()
       expect(data).toHaveLength(2)
 
-      const root1 = data.find((c: any) => c.id === 'root-1')
+      const root1 = data.find((c: { id: string }) => c.id === 'root-1')
       expect(root1).toBeDefined()
       expect(root1.name).toBe('Affaires Juridiques')
       expect(root1.subClustersCount).toBe(1) // direct child
       expect(root1.totalDocumentsCount).toBe(3) // 1 in root + 1 in child + 1 in grandchild
       expect(root1.lastDocumentDate).toBe('2026-04-01T00:00:00.000Z')
 
-      const root2 = data.find((c: any) => c.id === 'root-2')
+      const root2 = data.find((c: { id: string }) => c.id === 'root-2')
       expect(root2).toBeDefined()
       expect(root2.totalDocumentsCount).toBe(0)
       expect(root2.subClustersCount).toBe(0)

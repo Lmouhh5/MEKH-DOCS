@@ -21,14 +21,15 @@ export async function PATCH(
     return NextResponse.json({ error: 'Document non trouvé' }, { status: 404 })
   }
 
-  let body: any
+  let body: unknown
   try {
     body = await req.json()
   } catch {
     return NextResponse.json({ error: 'Corps de requête JSON invalide' }, { status: 400 })
   }
 
-  const targetClusterId = typeof body?.targetClusterId === 'string' ? body.targetClusterId.trim() : ''
+  const typedBody = body as { targetClusterId?: unknown }
+  const targetClusterId = typeof typedBody?.targetClusterId === 'string' ? typedBody.targetClusterId.trim() : ''
   if (!targetClusterId) {
     return NextResponse.json({ error: 'Le dossier cible est requis' }, { status: 400 })
   }

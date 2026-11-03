@@ -70,7 +70,7 @@ export async function GET(
 
   // Format documents with signed URLs
   const documents = await Promise.all(
-    (cluster.documents || []).map(async (doc: any) => {
+    (cluster.documents || []).map(async (doc) => {
       let signedUrl: string | undefined
       try {
         signedUrl = await getSignedUrl(doc.fileKey)
@@ -103,7 +103,7 @@ export async function GET(
     })
   )
 
-  const children = (cluster.children || []).map((child: any) => ({
+  const children = (cluster.children || []).map((child) => ({
     id: child.id,
     name: child.name,
     description: child.description,

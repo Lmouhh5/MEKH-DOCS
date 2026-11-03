@@ -51,10 +51,10 @@ interface ClusterDetailData {
 }
 
 export interface ClusterWorkspacePageProps {
-  params?: { id: string } | Promise<{ id: string }>
+  params: { id: string } | Promise<{ id: string }>
 }
 
-export default function ClusterWorkspacePage({ params }: ClusterWorkspacePageProps = {}) {
+export default function ClusterWorkspacePage({ params }: ClusterWorkspacePageProps) {
   const router = useRouter()
   const routerParams = useParams() as { id?: string } | undefined
 

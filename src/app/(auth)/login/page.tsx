@@ -85,26 +85,16 @@ export default function LoginPage() {
             Votre gestion aussi.
           </h1>
 
-          <p className="text-muted-foreground text-sm xl:text-base leading-relaxed mt-4 max-w-lg">
-            Vos documents, vos opérations et votre régime réel réunis dans un même espace. Pour garder le cap, chaque jour.
-          </p>
-
-          <figure className="mt-8 ribbon-panel overflow-hidden">
-            <div className="relative">
-              <Image
-                src="/images/quarry.jpg"
-                alt="Carrière et engins de travaux publics"
-                width={800}
-                height={400}
-                priority
-                className="w-full h-52 sm:h-64 xl:h-72 object-cover opacity-90"
-              />
-            </div>
-            <figcaption className="flex items-center justify-between py-2.5 px-4 border-t border-rule text-[12px] text-muted-foreground">
-              <span>Du chantier au bureau, une même vision.</span>
-              <span className="font-mono tabular-nums">TP</span>
-            </figcaption>
-          </figure>
+          <div className="mt-8 relative overflow-hidden rounded-2xl border border-rule/60 bg-black/50 shadow-2xl">
+            <Image
+              src="/images/login-illustration.png"
+              alt="Carrière, engins de travaux publics et gestion documentaire"
+              width={890}
+              height={610}
+              priority
+              className="w-full h-auto object-contain rounded-2xl"
+            />
+          </div>
         </div>
 
         <div className="pt-6 border-t border-rule grid grid-cols-3 gap-4">
@@ -150,7 +140,7 @@ export default function LoginPage() {
           </h2>
 
           <p className="text-muted-foreground text-sm mt-3 leading-relaxed">
-            Connectez-vous pour retrouver vos documents et reprendre le fil de votre activité.
+            Connectez-vous pour retrouver vos documents, bons de pesage, factures et de suivre le fil de votre activité chantier.
           </p>
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-4">
@@ -175,7 +165,7 @@ export default function LoginPage() {
                   id="email"
                   type="email"
                   name="email"
-                  placeholder="vous@entreprise.fr"
+                  placeholder="admin@erp.local ou contact@votre-entreprise.dz"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -198,7 +188,7 @@ export default function LoginPage() {
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   name="password"
-                  placeholder="Saisissez votre mot de passe"
+                  placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -266,7 +256,7 @@ export default function LoginPage() {
         </div>
 
         <div className="pt-6 text-center text-[13px] text-muted-foreground">
-          <p>© 2026 ERP · Travaux publics &amp; carrières</p>
+          <p>© 2026 ERP - Travaux publics &amp; carrières</p>
           <div className="flex items-center justify-center gap-2 mt-1">
             <span className="hover:text-ink cursor-pointer transition-colors duration-micro">
               Confidentialité

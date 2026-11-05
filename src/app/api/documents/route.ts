@@ -94,51 +94,90 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
   }
 
-  let formData: FormData
-  try {
-    formData = await req.formData()
-  } catch {
-    return NextResponse.json({ error: 'Données multipart invalides' }, { status: 400 })
+  const contentType = req.headers.get('content-type') || ''
+  let file: File | null = null
+  let preUploadedKey: string | null = null
+  let filename = 'document.pdf'
+  let mimetype = 'application/pdf'
+  let fileSize = 0
+  let rawData: Record<string, unknown> = {}
+
+  if (contentType.includes('application/json')) {
+    let json: Record<string, unknown>
+    try {
+      json = await req.json()
+    } catch {
+      return NextResponse.json({ error: 'Corps de requête JSON invalide' }, { status: 400 })
+    }
+    preUploadedKey = (json.fileKey as string) || null
+    filename = (json.filename as string) || (json.originalFilename as string) || 'document.pdf'
+    mimetype = (json.mimetype as string) || 'application/pdf'
+    fileSize = typeof json.fileSize === 'number' ? json.fileSize : parseInt((json.fileSize as string) || '0', 10)
+    rawData = json
+  } else {
+    let formData: FormData
+    try {
+      formData = await req.formData()
+    } catch {
+      return NextResponse.json({ error: 'Données multipart invalides' }, { status: 400 })
+    }
+
+    preUploadedKey = (formData.get('fileKey') as string) || null
+    file = formData.get('file') as File | null
+
+    if (preUploadedKey) {
+      filename =
+        (formData.get('filename') as string) ||
+        (formData.get('originalFilename') as string) ||
+        'document.pdf'
+      mimetype = (formData.get('mimetype') as string) || 'application/pdf'
+      fileSize = parseInt((formData.get('fileSize') as string) || '0', 10)
+    } else if (file && typeof file !== 'string' && (!(file instanceof Blob) || file.size > 0)) {
+      filename = file.name || 'document.pdf'
+      mimetype = file.type || 'application/pdf'
+      fileSize = file.size
+    }
+
+    rawData = {
+      title: (formData.get('title') as string) || '',
+      module: (formData.get('module') as string) || '',
+      documentType: (formData.get('documentType') as string) || '',
+      issueDate: (formData.get('issueDate') as string) || '',
+      dueDate: (formData.get('dueDate') as string) || null,
+      amount: (formData.get('amount') as string) || null,
+      isPaid: formData.get('isPaid') as string | null,
+      notes: (formData.get('notes') as string) || null,
+      physicalLocation: (formData.get('physicalLocation') as string) || null,
+      clientId: (formData.get('clientId') as string) || null,
+      fournisseurId: (formData.get('fournisseurId') as string) || null,
+      machineId: (formData.get('machineId') as string) || null,
+      travailleurId: (formData.get('travailleurId') as string) || null,
+      entityId: (formData.get('entityId') as string) || null,
+    }
   }
 
-  const file = formData.get('file') as File | null
-  if (!file || typeof file === 'string' || (file instanceof Blob && file.size === 0)) {
+  if (
+    !preUploadedKey &&
+    (!file || typeof file === 'string' || (file instanceof Blob && file.size === 0))
+  ) {
     return NextResponse.json({ error: 'Le fichier est requis' }, { status: 400 })
   }
 
   const MAX_FILE_SIZE = 25 * 1024 * 1024
-  if (file.size > MAX_FILE_SIZE) {
+  if (fileSize > MAX_FILE_SIZE) {
     return NextResponse.json(
       { error: 'Le fichier dépasse la taille maximale autorisée (25 Mo)' },
       { status: 400 }
     )
   }
 
-  const filename = file.name || 'document.pdf'
   const isPdf =
-    file.type === 'application/pdf' || filename.toLowerCase().endsWith('.pdf')
+    mimetype === 'application/pdf' || filename.toLowerCase().endsWith('.pdf')
   if (!isPdf) {
     return NextResponse.json(
       { error: 'Seuls les fichiers PDF sont acceptés' },
       { status: 400 }
     )
-  }
-
-  const rawData = {
-    title: (formData.get('title') as string) || '',
-    module: (formData.get('module') as string) || '',
-    documentType: (formData.get('documentType') as string) || '',
-    issueDate: (formData.get('issueDate') as string) || '',
-    dueDate: (formData.get('dueDate') as string) || null,
-    amount: (formData.get('amount') as string) || null,
-    isPaid: formData.get('isPaid') as string | null,
-    notes: (formData.get('notes') as string) || null,
-    physicalLocation: (formData.get('physicalLocation') as string) || null,
-    clientId: (formData.get('clientId') as string) || null,
-    fournisseurId: (formData.get('fournisseurId') as string) || null,
-    machineId: (formData.get('machineId') as string) || null,
-    travailleurId: (formData.get('travailleurId') as string) || null,
-    entityId: (formData.get('entityId') as string) || null,
   }
 
   const result = documentSchema.safeParse(rawData)
@@ -149,16 +188,6 @@ export async function POST(req: Request) {
   }
 
   const data = result.data
-
-  let buffer: Buffer
-  try {
-    const arrayBuffer = await file.arrayBuffer()
-    buffer = Buffer.from(arrayBuffer)
-  } catch {
-    return NextResponse.json({ error: 'Erreur lors de la lecture du fichier' }, { status: 500 })
-  }
-
-  const mimetype = file.type || 'application/pdf'
 
   const finalClientId =
     data.module === 'CLIENTS' ? (data.clientId || data.entityId || null) : null
@@ -181,15 +210,26 @@ export async function POST(req: Request) {
     data.entityId ||
     null
 
-  const key = generateKey(data.module, keyEntityId, filename)
+  let key = preUploadedKey
+  if (!key) {
+    key = generateKey(data.module, keyEntityId, filename)
 
-  try {
-    await uploadFile(buffer, key, mimetype)
-  } catch {
-    return NextResponse.json(
-      { error: 'Erreur lors du téléversement vers le stockage' },
-      { status: 500 }
-    )
+    let buffer: Buffer
+    try {
+      const arrayBuffer = await file!.arrayBuffer()
+      buffer = Buffer.from(arrayBuffer)
+    } catch {
+      return NextResponse.json({ error: 'Erreur lors de la lecture du fichier' }, { status: 500 })
+    }
+
+    try {
+      await uploadFile(buffer, key, mimetype)
+    } catch {
+      return NextResponse.json(
+        { error: 'Erreur lors du téléversement vers le stockage' },
+        { status: 500 }
+      )
+    }
   }
 
   const parsedDueDate =

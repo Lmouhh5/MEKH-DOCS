@@ -68,6 +68,77 @@ describe('DocumentUploadForm', () => {
     })
   })
 
+  it('uploads directly to storage via presigned PUT when file size exceeds 3.5MB', async () => {
+    const onSuccess = jest.fn()
+    ;(global.fetch as jest.Mock)
+      // 1. /api/documents/upload-url
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          uploadUrl: 'https://r2.cloudflarestorage.com/mock-upload-url',
+          fileKey: 'CLIENTS/client-1/large-file.pdf',
+        }),
+      })
+      // 2. Direct PUT to R2
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+      })
+      // 3. /api/documents (metadata)
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 201,
+        json: async () => ({ id: 'doc-large-123' }),
+      })
+
+    render(<DocumentUploadForm module="CLIENTS" entityId="client-1" onSuccess={onSuccess} />)
+
+    const largeFile = new File(['mock content'], 'large.pdf', { type: 'application/pdf' })
+    Object.defineProperty(largeFile, 'size', { value: 6 * 1024 * 1024 }) // 6 MB
+
+    await userEvent.upload(screen.getByLabelText(/fichier/i), largeFile)
+    await userEvent.type(screen.getByLabelText(/titre/i), 'Grand Contrat')
+    await userEvent.selectOptions(screen.getByLabelText(/type/i), 'CONTRAT_CLIENT')
+    await userEvent.type(screen.getByLabelText(/date d'émission/i), '2026-03-01')
+
+    await userEvent.click(screen.getByRole('button', { name: /téléverser|enregistrer|ajouter/i }))
+
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/documents/upload-url',
+        expect.objectContaining({
+          method: 'POST',
+          body: JSON.stringify({
+            filename: 'large.pdf',
+            mimetype: 'application/pdf',
+            module: 'CLIENTS',
+            entityId: 'client-1',
+          }),
+        })
+      )
+      expect(global.fetch).toHaveBeenCalledWith(
+        'https://r2.cloudflarestorage.com/mock-upload-url',
+        expect.objectContaining({
+          method: 'PUT',
+          body: largeFile,
+        })
+      )
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/documents',
+        expect.objectContaining({
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+        })
+      )
+    })
+
+    await waitFor(() => {
+      expect(onSuccess).toHaveBeenCalled()
+      expect(toast.success).toHaveBeenCalledWith('Document téléversé avec succès')
+    })
+  })
+
   it('shows error toast when server returns an error', async () => {
     ;(global.fetch as jest.Mock).mockResolvedValueOnce({
       ok: false,

@@ -72,28 +72,87 @@ export function DocumentUploadForm({
 
     setIsSubmitting(true)
     try {
-      const formData = new FormData()
-      formData.append('file', file)
-      formData.append('title', title.trim())
-      formData.append('module', module)
-      formData.append('documentType', documentType)
-      formData.append('issueDate', issueDate)
-      if (dueDate) formData.append('dueDate', dueDate)
-      if (amount) formData.append('amount', amount)
-      if (physicalLocation.trim()) {
-        formData.append('physicalLocation', physicalLocation.trim())
-      }
-      if (notes.trim()) {
-        formData.append('notes', notes.trim())
-      }
-      if (entityId) {
-        formData.append('entityId', entityId)
-      }
+      let res: Response
 
-      const res = await fetch('/api/documents', {
-        method: 'POST',
-        body: formData,
-      })
+      // For files larger than 3.5MB, use direct presigned upload to bypass Vercel's 4.5MB limit
+      const DIRECT_UPLOAD_THRESHOLD = 3.5 * 1024 * 1024
+      if (file.size > DIRECT_UPLOAD_THRESHOLD) {
+        // Step 1: Request presigned upload URL
+        const uploadUrlRes = await fetch('/api/documents/upload-url', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            filename: file.name,
+            mimetype: file.type || 'application/pdf',
+            module: module,
+            entityId: entityId || null,
+          }),
+        })
+
+        if (!uploadUrlRes.ok) {
+          const errData = await uploadUrlRes.json().catch(() => ({}))
+          throw new Error(errData?.error || "Impossible d'obtenir l'URL de téléversement sécurisée")
+        }
+
+        const { uploadUrl, fileKey } = await uploadUrlRes.json()
+
+        // Step 2: Stream file directly to Cloudflare R2 / S3 via PUT
+        const r2UploadRes = await fetch(uploadUrl, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': file.type || 'application/pdf',
+          },
+          body: file,
+        })
+
+        if (!r2UploadRes.ok) {
+          throw new Error('Échec du téléversement direct vers Cloudflare R2. Vérifiez la configuration CORS.')
+        }
+
+        // Step 3: Save metadata with fileKey
+        res = await fetch('/api/documents', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            fileKey,
+            filename: file.name,
+            mimetype: file.type || 'application/pdf',
+            fileSize: file.size,
+            title: title.trim(),
+            module,
+            documentType,
+            issueDate,
+            dueDate: dueDate || null,
+            amount: amount || null,
+            physicalLocation: physicalLocation.trim() || null,
+            notes: notes.trim() || null,
+            entityId: entityId || null,
+          }),
+        })
+      } else {
+        const formData = new FormData()
+        formData.append('file', file)
+        formData.append('title', title.trim())
+        formData.append('module', module)
+        formData.append('documentType', documentType)
+        formData.append('issueDate', issueDate)
+        if (dueDate) formData.append('dueDate', dueDate)
+        if (amount) formData.append('amount', amount)
+        if (physicalLocation.trim()) {
+          formData.append('physicalLocation', physicalLocation.trim())
+        }
+        if (notes.trim()) {
+          formData.append('notes', notes.trim())
+        }
+        if (entityId) {
+          formData.append('entityId', entityId)
+        }
+
+        res = await fetch('/api/documents', {
+          method: 'POST',
+          body: formData,
+        })
+      }
 
       if (!res.ok) {
         let errorMsg = 'Erreur lors du téléversement du document'
@@ -122,8 +181,9 @@ export function DocumentUploadForm({
         fileInputRef.current.value = ''
       }
       onSuccess()
-    } catch {
-      toast.error('Erreur de connexion au serveur')
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Erreur de connexion au serveur'
+      toast.error(msg)
     } finally {
       setIsSubmitting(false)
     }

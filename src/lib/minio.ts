@@ -1,5 +1,5 @@
 import { Client } from 'minio'
-import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3'
+import { S3Client, GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3'
 import { getSignedUrl as getS3SignedUrl } from '@aws-sdk/s3-request-presigner'
 
 const rawEndpoint = process.env.S3_ENDPOINT || process.env.MINIO_ENDPOINT || 'localhost'
@@ -77,6 +77,15 @@ export async function getSignedUrl(key: string): Promise<string> {
   const command = new GetObjectCommand({
     Bucket: BUCKET,
     Key: key,
+  })
+  return getS3SignedUrl(s3Client, command, { expiresIn: 900 })
+}
+
+export async function getUploadSignedUrl(key: string, mimetype: string): Promise<string> {
+  const command = new PutObjectCommand({
+    Bucket: BUCKET,
+    Key: key,
+    ContentType: mimetype,
   })
   return getS3SignedUrl(s3Client, command, { expiresIn: 900 })
 }

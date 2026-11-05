@@ -253,6 +253,94 @@ describe('Archive Dialogs', () => {
       expect(toast.error).toHaveBeenCalledWith('Veuillez sélectionner un fichier PDF')
       expect(global.fetch).not.toHaveBeenCalled()
     })
+
+    it('uploads directly to storage via presigned PUT when file size exceeds 3.5MB', async () => {
+      const onSuccess = jest.fn()
+      const onOpenChange = jest.fn()
+
+      ;(global.fetch as jest.Mock)
+        // 1. /api/documents/upload-url
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          json: async () => ({
+            uploadUrl: 'https://r2.storage.mock/upload/archives/large.pdf',
+            fileKey: 'archives/large.pdf',
+          }),
+        })
+        // 2. Direct PUT to R2
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+        })
+        // 3. /api/archive/documents (metadata)
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 201,
+          json: async () => ({ id: 'doc-arch-123', title: 'Grand Dossier Archive' }),
+        })
+
+      render(
+        <UploadArchiveDialog
+          open={true}
+          onOpenChange={onOpenChange}
+          clusterId="cluster-1"
+          onSuccess={onSuccess}
+        />
+      )
+
+      const largeFile = new File(['%PDF-1.4 large content'], 'archive-volumineuse.pdf', {
+        type: 'application/pdf',
+      })
+      Object.defineProperty(largeFile, 'size', { value: 8 * 1024 * 1024 }) // 8 MB
+
+      const fileInput = screen.getByLabelText(/Fichier/i)
+      await userEvent.upload(fileInput, largeFile)
+
+      fireEvent.change(screen.getByLabelText(/Titre du document/i), {
+        target: { value: 'Grand Dossier Archive' },
+      })
+      fireEvent.change(screen.getByLabelText(/Date d'émission/i), {
+        target: { value: '2026-04-15' },
+      })
+
+      fireEvent.click(screen.getByRole('button', { name: /Téléverser/i }))
+
+      await waitFor(() => {
+        expect(global.fetch).toHaveBeenCalledWith(
+          '/api/documents/upload-url',
+          expect.objectContaining({
+            method: 'POST',
+            body: JSON.stringify({
+              filename: 'archive-volumineuse.pdf',
+              mimetype: 'application/pdf',
+              module: 'ARCHIVES',
+              entityId: 'cluster-1',
+            }),
+          })
+        )
+        expect(global.fetch).toHaveBeenCalledWith(
+          'https://r2.storage.mock/upload/archives/large.pdf',
+          expect.objectContaining({
+            method: 'PUT',
+            body: largeFile,
+          })
+        )
+        expect(global.fetch).toHaveBeenCalledWith(
+          '/api/archive/documents',
+          expect.objectContaining({
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+          })
+        )
+      })
+
+      await waitFor(() => {
+        expect(toast.success).toHaveBeenCalledWith('Document téléversé avec succès')
+        expect(onSuccess).toHaveBeenCalled()
+        expect(onOpenChange).toHaveBeenCalledWith(false)
+      })
+    })
   })
 
   describe('MoveDocumentDialog', () => {

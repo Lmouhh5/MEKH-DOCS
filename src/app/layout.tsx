@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Figtree, Instrument_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { Analytics } from '@vercel/analytics/next';
 
 const instrumentSans = Instrument_Sans({
   subsets: ["latin"],
@@ -44,7 +45,10 @@ export default function RootLayout({
         jetbrainsMono.variable
       )}
     >
-      <body className="antialiased font-sans">{children}</body>
+      <body className="antialiased font-sans">
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }

@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
+    "postinstall": "prisma generate",
     "db:up": "docker compose up -d",
     "db:down": "docker compose down",
     "db:migrate": "npx prisma migrate deploy",

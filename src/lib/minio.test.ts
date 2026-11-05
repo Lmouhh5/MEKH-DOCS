@@ -1,9 +1,15 @@
 /**
  * @jest-environment node
  */
-import { getSignedUrl, generateKey, uploadFile, deleteFile, minioClient, BUCKET } from './minio'
+import { getSignedUrl, generateKey, uploadFile, deleteFile, minioClient, s3Client, BUCKET } from './minio'
 
 describe('minio file storage helper', () => {
+  it('exports valid minioClient and s3Client instances', () => {
+    expect(minioClient).toBeDefined()
+    expect(s3Client).toBeDefined()
+    expect(typeof BUCKET).toBe('string')
+  })
+
   it('getSignedUrl returns a string URL for a valid key', async () => {
     const url = await getSignedUrl('test/sample.pdf')
     expect(typeof url).toBe('string')

@@ -39,3 +39,7 @@ next-env.d.ts
 
 # superpowers visual companion
 .superpowers/
+
+# neon cli
+.neon
+skills-lock.json
